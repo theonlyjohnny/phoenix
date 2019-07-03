@@ -23,7 +23,6 @@ func Start(cfg *config.Config, s storage.Storage, b backend.Backend) error {
 	if err != nil {
 		return err
 	}
-	log.Debugf("made loop: %#v", loop)
 	loop.start()
 	return nil
 }
