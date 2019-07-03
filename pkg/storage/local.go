@@ -1,8 +1,6 @@
 package storage
 
 import (
-	"fmt"
-
 	"github.com/theonlyjohnny/phoenix/internal/cluster"
 	"github.com/theonlyjohnny/phoenix/internal/instance"
 )
@@ -42,7 +40,6 @@ func (s LocalStorage) DeleteInstance(phoenixID string) error {
 }
 
 func (s *LocalStorage) GetAllInstances() []*instance.Instance {
-	fmt.Printf("GetAllInstances: %#v \n", s)
 	instances := []*instance.Instance{}
 	for _, instance := range *s.instanceCache {
 		instances = append(instances, instance)

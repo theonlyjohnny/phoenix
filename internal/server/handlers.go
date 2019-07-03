@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,7 +30,6 @@ func postClusterHandler(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("wrapper: %#v \n", wrapper)
 	storage := *wrapper.storage
 	newCluster := &cluster.Cluster{Name: json.ClusterName}
 

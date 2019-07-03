@@ -1,7 +1,6 @@
 package loop
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/theonlyjohnny/phoenix/internal/config"
@@ -30,7 +29,6 @@ func Start(cfg *config.Config, s storage.Storage, b backend.Backend) error {
 }
 
 func newPhoenixLoop(cfg *config.Config, s storage.Storage, b backend.Backend) (*phoenixLoop, error) {
-	fmt.Printf("storage in newPhoenixLoop: %#v \n", s)
 	return &phoenixLoop{
 		cfg.LoopInterval,
 		b,
@@ -58,7 +56,6 @@ func (l *phoenixLoop) tick() {
 
 func (l *phoenixLoop) updateInstances() {
 	s := l.storage
-	fmt.Printf("updateInstances: %#v \n", s)
 	allInstances := s.GetAllInstances()
 	oldInstances := s.GetAllInstances()
 	delta := l.mergeInstances(allInstances, oldInstances)

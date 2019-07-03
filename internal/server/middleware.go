@@ -39,7 +39,6 @@ func logMiddleware() gin.HandlerFunc {
 func storageMiddleware(s *storage.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(StorageKey, storageWrapper{s})
-		fmt.Printf("post-adding storage: %#v \n", c.Keys)
 		c.Next()
 	}
 }
