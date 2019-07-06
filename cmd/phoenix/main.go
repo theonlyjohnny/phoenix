@@ -6,6 +6,7 @@ import (
 
 	"github.com/akamensky/argparse"
 	"github.com/theonlyjohnny/phoenix/internal/config"
+	"github.com/theonlyjohnny/phoenix/internal/job"
 	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/loop"
 	"github.com/theonlyjohnny/phoenix/internal/server"
@@ -37,6 +38,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	manager, err := job.NewManager()
+	if err != nil {
+		log.Errorf("unable to create job manager -- exiting -- %s", err.Error())
+		os.Exit(1)
+	}
+
 	go func() {
 		err := loop.Start(cfg, *storage, backend)
 		if err != nil {
@@ -44,5 +51,5 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-	server.Start(cfg, storage, backend)
+	server.Start(cfg, storage, backend, manager)
 }

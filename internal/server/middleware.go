@@ -5,11 +5,16 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/theonlyjohnny/phoenix/internal/job"
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
 type storageWrapper struct {
 	storage *storage.Storage
+}
+
+type managerWrapper struct {
+	manager *job.Manager
 }
 
 func authMiddleware() gin.HandlerFunc {
@@ -39,6 +44,13 @@ func logMiddleware() gin.HandlerFunc {
 func storageMiddleware(s *storage.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(StorageKey, storageWrapper{s})
+		c.Next()
+	}
+}
+
+func managerMiddleware(m *job.Manager) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(ManagerKey, managerWrapper{m})
 		c.Next()
 	}
 }
