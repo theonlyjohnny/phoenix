@@ -8,8 +8,6 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/log"
 )
 
-var singletonCache map[string]*Storage
-
 //Storage stores Clusters and Instances to an external datastore
 type Storage interface {
 	ListClusters() []*cluster.Cluster
@@ -20,15 +18,8 @@ type Storage interface {
 	GetAllInstances() []*instance.Instance
 }
 
-func init() {
-	singletonCache = make(map[string]*Storage)
-}
-
 //GetStorageByType returns an instantiated version of the requested storage
 func GetStorageByType(storageType string) (*Storage, error) {
-	if storage, ok := singletonCache[storageType]; ok {
-		return storage, nil
-	}
 
 	var storage Storage
 	var err error
@@ -45,7 +36,5 @@ func GetStorageByType(storageType string) (*Storage, error) {
 		return &storage, err
 	}
 
-	singletonCache[storageType] = &storage
-
-	return singletonCache[storageType], nil
+	return &storage, nil
 }
