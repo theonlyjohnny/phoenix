@@ -6,7 +6,10 @@ import (
 
 func (l *phoenixLoop) scaleClusters() {
 	s := l.storage
-	clusters := s.ListClusters()
+	clusters, err := s.ListClusters()
+	if err != nil {
+		log.Errorf("Unable to query clusters so unable to scale -- %s", err.Error())
+	}
 
 	for _, cluster := range clusters {
 		log.Infof("Scaling %s", cluster)

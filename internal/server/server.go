@@ -7,8 +7,8 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/internal/job"
 	"github.com/theonlyjohnny/phoenix/internal/log"
+	"github.com/theonlyjohnny/phoenix/internal/storage"
 	"github.com/theonlyjohnny/phoenix/pkg/backend"
-	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
 const (
@@ -31,7 +31,6 @@ func Start(cfg *config.Config, s *storage.Storage, b backend.Backend, m *job.Man
 	api.Use(authMiddleware())
 	api.Use(logMiddleware())
 	api.Use(storageMiddleware(s))
-	api.Use(managerMiddleware(m))
 
 	cluster := api.Group("/cluster")
 	cluster.POST("/", unWrapHandler(postClusterHandler))

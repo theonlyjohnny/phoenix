@@ -10,8 +10,8 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/loop"
 	"github.com/theonlyjohnny/phoenix/internal/server"
+	"github.com/theonlyjohnny/phoenix/internal/storage"
 	"github.com/theonlyjohnny/phoenix/pkg/backend"
-	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
 func main() {
@@ -32,20 +32,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	storage, err := storage.GetStorageByType(cfg.StorageType)
-	if err != nil {
-		log.Errorf("unable to create storage -- exiting -- %s", err.Error())
-		os.Exit(1)
-	}
-
 	manager, err := job.NewManager()
 	if err != nil {
 		log.Errorf("unable to create job manager -- exiting -- %s", err.Error())
 		os.Exit(1)
 	}
 
+	storage, err := storage.NewStorageEngine(cfg.StorageType, manager)
+	if err != nil {
+		log.Errorf("unable to create storage -- exiting -- %s", err.Error())
+		os.Exit(1)
+	}
+
 	go func() {
-		err := loop.Start(cfg, *storage, backend)
+		err := loop.Start(cfg, storage, backend)
 		if err != nil {
 			log.Errorf("unable to start loop -- exiting -- %s", err.Error())
 			os.Exit(1)

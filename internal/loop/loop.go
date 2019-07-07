@@ -5,19 +5,19 @@ import (
 
 	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/internal/log"
+	"github.com/theonlyjohnny/phoenix/internal/storage"
 	"github.com/theonlyjohnny/phoenix/pkg/backend"
-	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
 type phoenixLoop struct {
 	loopInterval time.Duration
 
 	backend backend.Backend
-	storage storage.Storage
+	storage *storage.Storage
 }
 
 // Start starts the main Phoenix loop
-func Start(cfg *config.Config, s storage.Storage, b backend.Backend) error {
+func Start(cfg *config.Config, s *storage.Storage, b backend.Backend) error {
 
 	loop, err := newPhoenixLoop(cfg, s, b)
 	if err != nil {
@@ -27,7 +27,7 @@ func Start(cfg *config.Config, s storage.Storage, b backend.Backend) error {
 	return nil
 }
 
-func newPhoenixLoop(cfg *config.Config, s storage.Storage, b backend.Backend) (*phoenixLoop, error) {
+func newPhoenixLoop(cfg *config.Config, s *storage.Storage, b backend.Backend) (*phoenixLoop, error) {
 	return &phoenixLoop{
 		cfg.LoopInterval,
 		b,
@@ -55,15 +55,27 @@ func (l *phoenixLoop) tick() {
 
 func (l *phoenixLoop) updateInstances() {
 	s := l.storage
-	allInstances := s.GetAllInstances()
-	oldInstances := s.GetAllInstances()
+	allInstances, err := s.ListInstances()
+	if err != nil {
+		log.Errorf("Couldn't get all new instances -- %s", err.Error())
+		return
+	}
+	oldInstances, err := s.ListInstances()
+	if err != nil {
+		log.Errorf("Couldn't get all old instances -- %s", err.Error())
+		return
+	}
 	delta := l.mergeInstances(allInstances, oldInstances)
 
 	for _, oldPhoenixID := range delta.deadPhoenixIDs {
-		s.DeleteInstance(oldPhoenixID)
+		if err := s.DeleteInstance(oldPhoenixID); err != nil {
+			log.Errorf("Unable to delete instance %s from storage -- %s", oldPhoenixID, err.Error())
+		}
 	}
 
 	for _, instance := range delta.instanceUpdates {
-		s.StoreInstance(instance)
+		if err := s.StoreInstance(instance); err != nil {
+			log.Errorf("Unable to store instance %s to storage -- %s", instance, err.Error())
+		}
 	}
 }

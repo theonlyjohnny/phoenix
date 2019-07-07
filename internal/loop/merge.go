@@ -13,7 +13,10 @@ type mergedInstancesDelta struct {
 
 func (l *phoenixLoop) mergeInstances(allInstances, oldInstances []*instance.Instance) *mergedInstancesDelta {
 	s := l.storage
-	clusters := s.ListClusters()
+	clusters, err := s.ListClusters()
+	if err != nil {
+		log.Errorf("unable to list clusters and thus unable to merge instances -- %s", err.Error())
+	}
 
 	updatedInstances := []*instance.Instance{}
 	deadPhoenixIDs := []string{}

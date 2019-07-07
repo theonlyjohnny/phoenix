@@ -1,40 +1,17 @@
 package storage
 
-import (
-	"fmt"
+//EntityType is used to distinguish what kind of entity is being stored
+type EntityType string
 
-	"github.com/theonlyjohnny/phoenix/internal/cluster"
-	"github.com/theonlyjohnny/phoenix/internal/instance"
-	"github.com/theonlyjohnny/phoenix/internal/log"
+const (
+	InstanceEntityType = EntityType("Instance")
+	ClusterEntityType  = EntityType("Cluster")
 )
 
-//Storage stores Clusters and Instances to an external datastore
+//Storage stores interfaces to some (ideally remote) persistent storage
 type Storage interface {
-	ListClusters() []*cluster.Cluster
-	StoreCluster(*cluster.Cluster) error
-
-	StoreInstance(*instance.Instance) error
-	DeleteInstance(string) error
-	GetAllInstances() []*instance.Instance
-}
-
-//GetStorageByType returns an instantiated version of the requested storage
-func GetStorageByType(storageType string) (*Storage, error) {
-
-	var storage Storage
-	var err error
-
-	switch storageType {
-	case "local":
-		storage, err = newLocalStorage()
-	default:
-		log.Errorf("Unable to find storage with type %s", storageType)
-		return &storage, fmt.Errorf("unknown storage %s", storage)
-	}
-
-	if err != nil {
-		return &storage, err
-	}
-
-	return &storage, nil
+	Store(EntityType, string, interface{}) error
+	List(EntityType) ([]interface{}, error)
+	Get(EntityType, string) (interface{}, error)
+	Delete(EntityType, string) error
 }

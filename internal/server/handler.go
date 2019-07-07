@@ -4,9 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/theonlyjohnny/phoenix/internal/storage"
 )
 
-type handler func(*gin.Context, *storageWrapper, *managerWrapper)
+type handler func(*gin.Context, *storage.Storage)
 
 func unWrapHandler(realHandler handler) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -15,23 +16,12 @@ func unWrapHandler(realHandler handler) func(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Request Storage"})
 		}
 
-		sWrapper, ok := s.(storageWrapper)
+		storage, ok := s.(*storage.Storage)
 		if !ok {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Storage"})
 			return
 		}
 
-		m, ok := c.Get(ManagerKey)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Request Manager"})
-		}
-
-		mWrapper, ok := m.(managerWrapper)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Manager"})
-			return
-		}
-
-		realHandler(c, &sWrapper, &mWrapper)
+		realHandler(c, storage)
 	}
 }
