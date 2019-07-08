@@ -32,7 +32,7 @@ func logMiddleware() gin.HandlerFunc {
 	})
 }
 
-func storageMiddleware(s *storage.Storage) gin.HandlerFunc {
+func storageMiddleware(s *storage.Engine) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(StorageKey, s)
 		c.Next()

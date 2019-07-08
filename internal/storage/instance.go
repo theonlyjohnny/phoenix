@@ -6,7 +6,7 @@ import (
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
-func (s *Storage) ListInstances() ([]*instance.Instance, error) {
+func (s *Engine) ListInstances() ([]*instance.Instance, error) {
 	vals, err := s.backing.List(storage.InstanceEntityType)
 	res := make([]*instance.Instance, len(vals))
 	if err != nil {
@@ -23,10 +23,10 @@ func (s *Storage) ListInstances() ([]*instance.Instance, error) {
 	return res, nil
 }
 
-func (s *Storage) DeleteInstance(key string) error {
+func (s *Engine) DeleteInstance(key string) error {
 	return s.backing.Delete(storage.InstanceEntityType, key)
 }
 
-func (s *Storage) StoreInstance(i *instance.Instance) error {
+func (s *Engine) StoreInstance(i *instance.Instance) error {
 	return s.backing.Store(storage.InstanceEntityType, i.PhoenixID, i)
 }

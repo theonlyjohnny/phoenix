@@ -13,11 +13,11 @@ type phoenixLoop struct {
 	loopInterval time.Duration
 
 	backend backend.Backend
-	storage *storage.Storage
+	storage *storage.Engine
 }
 
 // Start starts the main Phoenix loop
-func Start(cfg *config.Config, s *storage.Storage, b backend.Backend) error {
+func Start(cfg *config.Config, s *storage.Engine, b backend.Backend) error {
 
 	loop, err := newPhoenixLoop(cfg, s, b)
 	if err != nil {
@@ -27,7 +27,7 @@ func Start(cfg *config.Config, s *storage.Storage, b backend.Backend) error {
 	return nil
 }
 
-func newPhoenixLoop(cfg *config.Config, s *storage.Storage, b backend.Backend) (*phoenixLoop, error) {
+func newPhoenixLoop(cfg *config.Config, s *storage.Engine, b backend.Backend) (*phoenixLoop, error) {
 	return &phoenixLoop{
 		cfg.LoopInterval,
 		b,

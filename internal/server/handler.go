@@ -7,18 +7,18 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 )
 
-type handler func(*gin.Context, *storage.Storage)
+type handler func(*gin.Context, *storage.Engine)
 
 func unWrapHandler(realHandler handler) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		s, ok := c.Get(StorageKey)
 		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Request Storage"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Request Engine"})
 		}
 
-		storage, ok := s.(*storage.Storage)
+		storage, ok := s.(*storage.Engine)
 		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Storage"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid Engine"})
 			return
 		}
 

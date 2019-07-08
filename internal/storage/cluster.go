@@ -7,7 +7,7 @@ import (
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
-func (s *Storage) ListClusters() (cluster.List, error) {
+func (s *Engine) ListClusters() (cluster.List, error) {
 	vals, err := s.backing.List(storage.ClusterEntityType)
 	res := make(cluster.List, len(vals))
 
@@ -26,7 +26,7 @@ func (s *Storage) ListClusters() (cluster.List, error) {
 	return res, nil
 }
 
-func (s *Storage) StoreCluster(c *cluster.Cluster) error {
+func (s *Engine) StoreCluster(c *cluster.Cluster) error {
 	err := s.backing.Store(storage.ClusterEntityType, c.Name, c)
 	if err != nil {
 		return err

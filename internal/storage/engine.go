@@ -8,17 +8,17 @@ import (
 	extern_storage "github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
-type Storage struct {
+type Engine struct {
 	backing extern_storage.Storage
 	manager *job.Manager
 }
 
-func NewStorageEngine(storageType string, manager *job.Manager) (*Storage, error) {
+func NewStorageEngine(storageType string, manager *job.Manager) (*Engine, error) {
 	backing, err := getBackingByType(storageType)
 	if err != nil {
 		return nil, err
 	}
-	return &Storage{
+	return &Engine{
 		backing: backing,
 		manager: manager,
 	}, nil

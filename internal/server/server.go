@@ -12,14 +12,14 @@ import (
 )
 
 const (
-	//StorageKey is the key to access the instantiated storage.Storage within a request context
+	//StorageKey is the key to access the instantiated storage.Engine within a request context
 	StorageKey = string(iota)
 	//ManagerKey is the key to access the instantiated job.Manager within a request context
 	ManagerKey = string(iota)
 )
 
 // Start starts the HTTP server on the specified port
-func Start(cfg *config.Config, s *storage.Storage, b backend.Backend, m *job.Manager) error {
+func Start(cfg *config.Config, s *storage.Engine, b backend.Backend, m *job.Manager) error {
 	port := cfg.Port
 
 	log.Infof("Starting server on %d \n", port)
