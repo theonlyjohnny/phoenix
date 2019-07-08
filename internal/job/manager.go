@@ -2,23 +2,8 @@ package job
 
 import "github.com/theonlyjohnny/phoenix/internal/log"
 
-type eventType string
-
-//An Event is fired everytime a resource changes and needs to have its state recalculated
-type Event struct {
-	Type eventType
-	Key  string
-}
-
 //A Manager receives Events, recalculates state, and then applies any differences
 type Manager struct{}
-
-const (
-	//ClusterEventType is used when a Cluster-level change has occured
-	ClusterEventType = eventType("Cluster")
-	//InstanceEventType is used when a Instance-level change has occured
-	InstanceEventType = eventType("Instance")
-)
 
 //NewManager returns a pointer to a newly instantiated Manager
 func NewManager() (*Manager, error) {
@@ -28,4 +13,13 @@ func NewManager() (*Manager, error) {
 //AddEvent is used to tell the Manager that there is a new Event it needs to care about
 func (m *Manager) AddEvent(event Event) {
 	log.Debugf("AddEvent: %#v", event)
+	switch event.Type {
+	case ClusterEventType:
+		m.addClusterEvent(event.Key)
+	default:
+		log.Warnf("Unhandled event type: %s", event)
+	}
 }
+
+//TODO manage # of concurrect goroutines? <- limiting
+//TODO make events go into queue and cancelable via context.Context

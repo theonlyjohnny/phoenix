@@ -6,6 +6,9 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/instance"
 )
 
+//A List is a list of Cluster pointers
+type List []*Cluster
+
 //A Cluster represents a scaling set of Instances
 type Cluster struct {
 	Name string `json:"name"`

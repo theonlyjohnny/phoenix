@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+//A List is a list of Instance pointers
+type List []*Instance
+
 //An Instance represents a managed server provided by a Backend
 type Instance struct {
 	PhoenixID  string `json:"phoenix_id"`

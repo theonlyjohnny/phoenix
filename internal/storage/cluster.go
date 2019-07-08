@@ -7,12 +7,14 @@ import (
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
-func (s *Storage) ListClusters() ([]*cluster.Cluster, error) {
+func (s *Storage) ListClusters() (cluster.List, error) {
 	vals, err := s.backing.List(storage.ClusterEntityType)
-	res := make([]*cluster.Cluster, len(vals))
+	res := make(cluster.List, len(vals))
+
 	if err != nil {
 		return res, err
 	}
+
 	for i, v := range vals {
 		cluster, ok := v.(*cluster.Cluster)
 		if ok {

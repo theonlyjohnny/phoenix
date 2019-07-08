@@ -7,18 +7,18 @@ import (
 )
 
 type mergedInstancesDelta struct {
-	instanceUpdates []*instance.Instance
+	instanceUpdates instance.List
 	deadPhoenixIDs  []string
 }
 
-func (l *phoenixLoop) mergeInstances(allInstances, oldInstances []*instance.Instance) *mergedInstancesDelta {
+func (l *phoenixLoop) mergeInstances(allInstances, oldInstances instance.List) *mergedInstancesDelta {
 	s := l.storage
 	clusters, err := s.ListClusters()
 	if err != nil {
 		log.Errorf("unable to list clusters and thus unable to merge instances -- %s", err.Error())
 	}
 
-	updatedInstances := []*instance.Instance{}
+	updatedInstances := instance.List{}
 	deadPhoenixIDs := []string{}
 
 	relevantInstancesIDMap := map[string]*instance.Instance{}
