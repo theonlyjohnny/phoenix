@@ -1,24 +1,26 @@
 package job
 
-import "github.com/theonlyjohnny/phoenix/internal/log"
+import (
+	"github.com/theonlyjohnny/phoenix/internal/scale"
+	"github.com/theonlyjohnny/phoenix/internal/storage"
+	"github.com/theonlyjohnny/phoenix/pkg/backend"
+)
 
 //A Manager receives Events, recalculates state, and then applies any differences
-type Manager struct{}
+type Manager struct {
+	storage *storage.Engine
+	backend backend.Backend
 
-//NewManager returns a pointer to a newly instantiated Manager
-func NewManager() (*Manager, error) {
-	return &Manager{}, nil
+	clusterLogic *scale.ClusterLogic
 }
 
-//AddEvent is used to tell the Manager that there is a new Event it needs to care about
-func (m *Manager) AddEvent(event Event) {
-	log.Debugf("AddEvent: %#v", event)
-	switch event.Type {
-	case ClusterEventType:
-		m.addClusterEvent(event.Key)
-	default:
-		log.Warnf("Unhandled event type: %s", event)
-	}
+//NewManager returns a pointer to a newly instantiated Manager
+func NewManager(storage *storage.Engine, backend backend.Backend) (*Manager, error) {
+	return &Manager{
+		storage,
+		backend,
+		scale.NewClusterLogic(storage),
+	}, nil
 }
 
 //TODO manage # of concurrect goroutines? <- limiting

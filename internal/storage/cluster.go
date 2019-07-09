@@ -1,8 +1,9 @@
 package storage
 
 import (
+	"fmt"
+
 	"github.com/theonlyjohnny/phoenix/internal/cluster"
-	"github.com/theonlyjohnny/phoenix/internal/job"
 	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
@@ -31,10 +32,20 @@ func (s *Engine) StoreCluster(c *cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
+	log.Debugf("storing %s", c)
 
-	s.manager.AddEvent(job.Event{
-		Type: job.ClusterEventType,
-		Key:  c.Name,
-	})
 	return nil
+}
+
+func (s *Engine) GetCluster(clusterName string) (*cluster.Cluster, error) {
+	v, err := s.backing.Get(storage.ClusterEntityType, clusterName)
+	if err != nil {
+		return nil, err
+	}
+	cluster, ok := v.(*cluster.Cluster)
+	if !ok {
+		return nil, fmt.Errorf("Unable to coerce %#v into *cluster.Cluster", v)
+	}
+
+	return cluster, nil
 }

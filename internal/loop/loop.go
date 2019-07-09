@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/theonlyjohnny/phoenix/internal/config"
+	"github.com/theonlyjohnny/phoenix/internal/job"
 	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 	"github.com/theonlyjohnny/phoenix/pkg/backend"
@@ -14,12 +15,13 @@ type phoenixLoop struct {
 
 	backend backend.Backend
 	storage *storage.Engine
+	manager *job.Manager
 }
 
 // Start starts the main Phoenix loop
-func Start(cfg *config.Config, s *storage.Engine, b backend.Backend) error {
+func Start(cfg *config.Config, s *storage.Engine, b backend.Backend, m *job.Manager) error {
 
-	loop, err := newPhoenixLoop(cfg, s, b)
+	loop, err := newPhoenixLoop(cfg, s, b, m)
 	if err != nil {
 		return err
 	}
@@ -27,11 +29,12 @@ func Start(cfg *config.Config, s *storage.Engine, b backend.Backend) error {
 	return nil
 }
 
-func newPhoenixLoop(cfg *config.Config, s *storage.Engine, b backend.Backend) (*phoenixLoop, error) {
+func newPhoenixLoop(cfg *config.Config, s *storage.Engine, b backend.Backend, m *job.Manager) (*phoenixLoop, error) {
 	return &phoenixLoop{
 		cfg.LoopInterval,
 		b,
 		s,
+		m,
 	}, nil
 }
 
@@ -50,7 +53,7 @@ func (l *phoenixLoop) start() {
 func (l *phoenixLoop) tick() {
 	log.Debugf("Tick")
 	l.updateInstances()
-	l.scaleClusters()
+	l.checkInstances()
 }
 
 func (l *phoenixLoop) updateInstances() {

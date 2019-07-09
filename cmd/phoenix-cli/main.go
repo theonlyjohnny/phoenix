@@ -32,24 +32,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	manager, err := job.NewManager()
-	if err != nil {
-		log.Errorf("unable to create job manager -- exiting -- %s", err.Error())
-		os.Exit(1)
-	}
-
-	storage, err := storage.NewStorageEngine(cfg.StorageType, manager)
+	storage, err := storage.NewStorageEngine(cfg.StorageType)
 	if err != nil {
 		log.Errorf("unable to create storage -- exiting -- %s", err.Error())
 		os.Exit(1)
 	}
 
+	manager, err := job.NewManager(storage, backend)
+	if err != nil {
+		log.Errorf("unable to create job manager -- exiting -- %s", err.Error())
+		os.Exit(1)
+	}
+
 	go func() {
-		err := loop.Start(cfg, storage, backend)
+		err := loop.Start(cfg, storage, backend, manager)
 		if err != nil {
 			log.Errorf("unable to start loop -- exiting -- %s", err.Error())
 			os.Exit(1)
 		}
 	}()
-	server.Start(cfg, storage, backend, manager)
+	server.Start(cfg, storage, manager)
 }

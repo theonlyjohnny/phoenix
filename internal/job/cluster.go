@@ -1,7 +1,5 @@
 package job
 
-func (m *Manager) addClusterEvent(clusterName string) {
-	go m.operateOnClusterEvent(clusterName)
+func (m *Manager) AddClusterEvent(clusterName string) {
+	go m.clusterLogic.Scale(clusterName)
 }
-
-func (m *Manager) operateOnClusterEvent(clusterName string) {}
