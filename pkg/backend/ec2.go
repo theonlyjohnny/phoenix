@@ -65,8 +65,8 @@ func (e EC2) create(cfg config.BackendConfig) (Backend, error) {
 	return e, nil
 }
 
-func (e EC2) GetAllInstances() []*instance.Instance {
-	end := []*instance.Instance{}
+func (e EC2) GetAllInstances() instance.List {
+	var end instance.List
 	max := int64(1000)
 	input := &ec2.DescribeInstancesInput{
 		MaxResults: &max, //max -- TODO pagination

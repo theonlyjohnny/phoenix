@@ -11,7 +11,7 @@ import (
 //Backend is a shared interface for integration with external cloud providers (EC2, GCM, etc.)
 type Backend interface {
 	create(config.BackendConfig) (Backend, error)
-	GetAllInstances() []*instance.Instance
+	GetAllInstances() instance.List
 	// UpdateInstance(*instance.Instance) error
 	// UpdateInstances(*[]instance.Instance) error
 }

@@ -6,9 +6,9 @@ import (
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
-func (s *Engine) ListInstances() ([]*instance.Instance, error) {
+func (s *Engine) ListInstances() (instance.List, error) {
 	vals, err := s.backing.List(storage.InstanceEntityType)
-	res := make([]*instance.Instance, len(vals))
+	res := make(instance.List, len(vals))
 	if err != nil {
 		return res, err
 	}
