@@ -50,7 +50,8 @@ func (l *phoenixLoop) mergeInstances(allInstances, oldInstances instance.List) *
 				log.Warnf("Found a managed instance with no known cluster, did a cluster get deleted? %s", instance)
 				deadPhoenixIDs = append(deadPhoenixIDs, instance.PhoenixID)
 			} else {
-				log.Debugf("Found an instance with no known cluster -- %s", instance)
+				log.Debugf("Found a new instance with no known cluster -- %s", instance)
+				updatedInstances = append(updatedInstances, instance)
 			}
 			continue
 		}

@@ -12,8 +12,7 @@ import (
 type Backend interface {
 	create(config.BackendConfig) (Backend, error)
 	GetAllInstances() instance.List
-	// UpdateInstance(*instance.Instance) error
-	// UpdateInstances(*[]instance.Instance) error
+	CreateInstance(*instance.Instance) error
 }
 
 //GetBackendByType returns an instantiated version of the requested backend

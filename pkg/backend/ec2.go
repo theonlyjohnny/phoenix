@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -12,6 +13,10 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/log"
 
 	"github.com/theonlyjohnny/phoenix/internal/instance"
+)
+
+var (
+	clusterNameRegexp = regexp.MustCompile(`(?:us|ap|sa|eu)(?:n|e|s|w|c)+[0-9]-([a-z]*)-[0-9]*`)
 )
 
 //EC2 Backend
@@ -115,6 +120,10 @@ func (e EC2) GetAllInstances() instance.List {
 			instance.Name = nameTag
 		}
 
+		if matches := clusterNameRegexp.FindSubmatch([]byte(instance.Name)); len(matches) > 1 {
+			instance.ClusterName = string(matches[1])
+		}
+
 		// log.Debugf("reservation: %s --> instance: %s", reservation, instance)
 		end = append(end, &instance)
 	}
@@ -122,6 +131,36 @@ func (e EC2) GetAllInstances() instance.List {
 	return end
 }
 
-// func (e EC2) UpdateInstance(*instance.Instance) error {
-// return nil
-// }
+func (e EC2) CreateInstance(i *instance.Instance) error {
+	input := &ec2.RunInstancesInput{
+		ImageId:  aws.String("ami-0b4a9c56e9f69e9f8"),
+		MinCount: aws.Int64(1),
+		MaxCount: aws.Int64(1),
+		TagSpecifications: []*ec2.TagSpecification{
+			{
+				ResourceType: aws.String("instance"),
+				Tags: []*ec2.Tag{
+					{
+						Key:   aws.String("Name"),
+						Value: aws.String(i.Name),
+					},
+					{
+						Key:   aws.String("PhoenixID"),
+						Value: aws.String(i.PhoenixID),
+					},
+					{
+						Key:   aws.String("ManagedBy"),
+						Value: aws.String("phoenix"),
+					},
+				},
+			},
+		},
+	}
+
+	_, err := e.client.RunInstances(input)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}

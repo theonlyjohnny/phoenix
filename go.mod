@@ -17,6 +17,7 @@ require (
 	github.com/mattn/go-isatty v0.0.8
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 	github.com/modern-go/reflect2 v1.0.1
+	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/theonlyjohnny/jogger-go v1.1.1
 	github.com/ugorji/go v1.1.4

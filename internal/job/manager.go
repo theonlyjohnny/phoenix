@@ -8,18 +8,13 @@ import (
 
 //A Manager receives Events, recalculates state, and then applies any differences
 type Manager struct {
-	storage *storage.Engine
-	backend backend.Backend
-
 	clusterLogic *scale.ClusterLogic
 }
 
 //NewManager returns a pointer to a newly instantiated Manager
 func NewManager(storage *storage.Engine, backend backend.Backend) (*Manager, error) {
 	return &Manager{
-		storage,
-		backend,
-		scale.NewClusterLogic(storage),
+		scale.NewClusterLogic(storage, backend),
 	}, nil
 }
 

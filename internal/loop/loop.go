@@ -58,11 +58,8 @@ func (l *phoenixLoop) tick() {
 
 func (l *phoenixLoop) updateInstances() {
 	s := l.storage
-	allInstances, err := s.ListInstances()
-	if err != nil {
-		log.Errorf("Couldn't get all new instances -- %s", err.Error())
-		return
-	}
+	b := l.backend
+	allInstances := b.GetAllInstances()
 	oldInstances, err := s.ListInstances()
 	if err != nil {
 		log.Errorf("Couldn't get all old instances -- %s", err.Error())

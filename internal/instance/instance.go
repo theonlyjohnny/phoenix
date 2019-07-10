@@ -3,6 +3,8 @@ package instance
 import (
 	"fmt"
 	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 //A List is a list of Instance pointers
@@ -23,4 +25,12 @@ type Instance struct {
 
 func (i Instance) String() string {
 	return fmt.Sprintf("Instance{PhoenixID: %s, ExternalID: %s, Name: %s, Hostname, %s, ClusterName: %s, UpdatedDTTM: %s}", i.PhoenixID, i.ExternalID, i.Name, i.Hostname, i.ClusterName, i.UpdatedDTTM)
+}
+
+func NewInstance(name string) *Instance {
+	phoenixID := uuid.NewV4().String()
+	return &Instance{
+		PhoenixID: phoenixID,
+		Name:      name,
+	}
 }
