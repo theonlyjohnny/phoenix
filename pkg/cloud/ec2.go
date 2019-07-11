@@ -1,4 +1,4 @@
-package backend
+package cloud
 
 import (
 	"context"
@@ -19,30 +19,31 @@ var (
 	clusterNameRegexp = regexp.MustCompile(`(?:us|ap|sa|eu)(?:n|e|s|w|c)+[0-9]-([a-z]*)-[0-9]*`)
 )
 
-//EC2 Backend
+//EC2 Cloud
 type EC2 struct {
 	client *ec2.EC2
 	ctx    context.Context
 }
 
-func getStrFromCfg(cfg config.BackendConfig, k string) (string, error) {
+func getStrFromCfg(cfg config.CloudProviderConfig, k string) (string, error) {
 	var res string
 	if interf, ok := cfg[k]; ok {
 		if cfgStr, ok := interf.(string); ok {
 			if cfgStr == "" {
-				return res, fmt.Errorf("backend_config.%s cannot be an empty string", k)
+				return res, fmt.Errorf("cloud_config.%s cannot be an empty string", k)
 			}
 			res = cfgStr
 		} else {
-			return res, fmt.Errorf("backend_config.%s is not a string", k)
+			return res, fmt.Errorf("cloud_config.%s is not a string", k)
 		}
 	} else {
-		return res, fmt.Errorf("When using the EC2 backend, backend_config.%s is a required parameter", k)
+		return res, fmt.Errorf("When using the EC2 cloud, cloud_config.%s is a required parameter", k)
 	}
 	return res, nil
 }
 
-func (e EC2) create(cfg config.BackendConfig) (Backend, error) {
+func NewEC2CloudProvider(cfg config.CloudProviderConfig) (EC2, error) {
+	var e EC2
 	errs := make([]error, 3)
 	awsID, err := getStrFromCfg(cfg, "AWS_ACCESS_KEY_ID")
 	errs = append(errs, err)
@@ -70,7 +71,7 @@ func (e EC2) create(cfg config.BackendConfig) (Backend, error) {
 	return e, nil
 }
 
-func (e EC2) GetAllInstances() instance.List {
+func (e EC2) GetAllInstances() (instance.List, error) {
 	var end instance.List
 	max := int64(1000)
 	input := &ec2.DescribeInstancesInput{
@@ -88,7 +89,7 @@ func (e EC2) GetAllInstances() instance.List {
 	output, err := e.client.DescribeInstances(input)
 	if err != nil {
 		log.Warnf("Unable to DescribeInstances --%s", err.Error())
-		return end
+		return end, err
 	}
 
 	for _, reservation := range output.Reservations {
@@ -128,7 +129,7 @@ func (e EC2) GetAllInstances() instance.List {
 		end = append(end, &instance)
 	}
 
-	return end
+	return end, nil
 }
 
 func (e EC2) CreateInstance(i *instance.Instance) error {

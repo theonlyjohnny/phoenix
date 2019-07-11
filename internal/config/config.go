@@ -9,14 +9,10 @@ import (
 )
 
 var (
-	validBackends = []string{"ec2"}
 	validStorages = []string{"local"}
 )
 
-//BackendConfig is an arbitrary JSON interface for use by individual backends
-type BackendConfig map[string]interface{}
-
-//StorageConfig is an arbitrary JSON interface for use by individual backends
+//StorageConfig is an arbitrary JSON interface for use by individual clouds
 // type StorageConfig map[string]interface{}
 
 //Config stores all the config values read from a config file
@@ -24,8 +20,8 @@ type Config struct {
 	Port         int           `json:"port"`
 	LoopInterval time.Duration `json:"loop_interval_ns"`
 
-	BackendType   string        `json:"backend_type"`
-	BackendConfig BackendConfig `json:"backend_config"`
+	CloudType           string                         `json:"cloud_type"`
+	CloudProviderConfig map[string]CloudProviderConfig `json:"cloud_config"`
 
 	StorageType string `json:"storage_type"`
 	// StorageConfig StorageConfig `json:"storage_config"`
@@ -33,11 +29,11 @@ type Config struct {
 
 func defaultConfig() *Config {
 	return &Config{
-		Port:          9000,
-		LoopInterval:  time.Second * 10,
-		BackendType:   "ec2",
-		BackendConfig: BackendConfig{},
-		StorageType:   "local",
+		Port:                9000,
+		LoopInterval:        time.Second * 10,
+		CloudType:           "ec2",
+		CloudProviderConfig: map[string]CloudProviderConfig{},
+		StorageType:         "local",
 	}
 }
 
@@ -55,13 +51,13 @@ func ReadConfigFromFs(path string) *Config {
 		log.Warnf("Unable to combine config with default config -- %s", err.Error())
 	}
 
-	isValidBackend := strContains(cfg.BackendType, validBackends)
+	isValidCloud := strContains(cfg.CloudType, validClouds)
 	isValidStorage := strContains(cfg.StorageType, validStorages)
 
-	if !isValidBackend {
-		defaultBackend := defaultConfig().BackendType
-		log.Warnf("invalid backend specified %s -- falling back to %s", cfg.BackendType, defaultBackend)
-		cfg.BackendType = defaultBackend
+	if !isValidCloud {
+		defaultCloud := defaultConfig().CloudType
+		log.Warnf("invalid cloud specified %s -- falling back to %s", cfg.CloudType, defaultCloud)
+		cfg.CloudType = defaultCloud
 	}
 
 	if !isValidStorage {

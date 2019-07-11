@@ -3,25 +3,25 @@ package loop
 import (
 	"time"
 
+	"github.com/theonlyjohnny/phoenix/internal/cloud"
 	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/internal/job"
 	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
-	"github.com/theonlyjohnny/phoenix/pkg/backend"
 )
 
 type phoenixLoop struct {
 	loopInterval time.Duration
 
-	backend backend.Backend
+	cloud   *cloud.Engine
 	storage *storage.Engine
 	manager *job.Manager
 }
 
 // Start starts the main Phoenix loop
-func Start(cfg *config.Config, s *storage.Engine, b backend.Backend, m *job.Manager) error {
+func Start(cfg *config.Config, s *storage.Engine, c *cloud.Engine, m *job.Manager) error {
 
-	loop, err := newPhoenixLoop(cfg, s, b, m)
+	loop, err := newPhoenixLoop(cfg, s, c, m)
 	if err != nil {
 		return err
 	}
@@ -29,10 +29,10 @@ func Start(cfg *config.Config, s *storage.Engine, b backend.Backend, m *job.Mana
 	return nil
 }
 
-func newPhoenixLoop(cfg *config.Config, s *storage.Engine, b backend.Backend, m *job.Manager) (*phoenixLoop, error) {
+func newPhoenixLoop(cfg *config.Config, s *storage.Engine, c *cloud.Engine, m *job.Manager) (*phoenixLoop, error) {
 	return &phoenixLoop{
 		cfg.LoopInterval,
-		b,
+		c,
 		s,
 		m,
 	}, nil
@@ -58,8 +58,12 @@ func (l *phoenixLoop) tick() {
 
 func (l *phoenixLoop) updateInstances() {
 	s := l.storage
-	b := l.backend
-	allInstances := b.GetAllInstances()
+	c := l.cloud
+	allInstances, err := c.GetAllInstances()
+	if err != nil {
+		log.Errorf("Couldn't get all new instances -- %s", err.Error())
+		return
+	}
 	oldInstances, err := s.ListInstances()
 	if err != nil {
 		log.Errorf("Couldn't get all old instances -- %s", err.Error())

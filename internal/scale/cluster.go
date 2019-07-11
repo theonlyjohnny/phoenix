@@ -3,26 +3,26 @@ package scale
 import (
 	"fmt"
 
+	"github.com/theonlyjohnny/phoenix/internal/cloud"
 	"github.com/theonlyjohnny/phoenix/internal/instance"
 	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
-	"github.com/theonlyjohnny/phoenix/pkg/backend"
 )
 
 type ClusterLogic struct {
 	storage *storage.Engine
-	backend backend.Backend
+	cloud   *cloud.Engine
 }
 
-func NewClusterLogic(s *storage.Engine, b backend.Backend) *ClusterLogic {
+func NewClusterLogic(s *storage.Engine, c *cloud.Engine) *ClusterLogic {
 	return &ClusterLogic{
 		s,
-		b,
+		c,
 	}
 }
 
-func (c *ClusterLogic) Scale(clusterName string) {
-	cluster, err := c.storage.GetCluster(clusterName)
+func (l *ClusterLogic) Scale(clusterName string) {
+	cluster, err := l.storage.GetCluster(clusterName)
 	if err != nil {
 		log.Errorf("Couldn't scale %s -- %s", clusterName, err.Error())
 	}
@@ -31,7 +31,7 @@ func (c *ClusterLogic) Scale(clusterName string) {
 		log.Warnf("Told to Scale a non-existent cluster? %s", clusterName)
 		return
 	}
-	instances, err := c.storage.ListInstances()
+	instances, err := l.storage.ListInstances()
 	if err != nil {
 		log.Errorf("Couldn't scale %s -- %s", cluster.Name, err.Error())
 	}
@@ -47,7 +47,7 @@ func (c *ClusterLogic) Scale(clusterName string) {
 		log.Infof("Cluster %s Scale up -- %d < %d", clusterName, present, cluster.MinHealthy)
 		for i := 0; i < required; i++ {
 			name := fmt.Sprintf("usw1-%s-00%d", clusterName, i)
-			if err := c.backend.CreateInstance(instance.NewInstance(name)); err != nil {
+			if err := l.cloud.CreateInstance(clusterName, instance.NewInstance(name)); err != nil {
 				log.Errorf("unable to create instance %s -- %s", name, err.Error())
 			}
 		}
