@@ -2,9 +2,16 @@ package job
 
 import (
 	"github.com/theonlyjohnny/phoenix/internal/cloud"
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/scale"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 )
+
+var log logger.Logger
+
+func init() {
+	log = logger.Log
+}
 
 //A Manager receives Events, recalculates state, and then applies any differences
 type Manager struct {

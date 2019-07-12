@@ -5,7 +5,6 @@ import (
 
 	"github.com/theonlyjohnny/phoenix/internal/cloud"
 	"github.com/theonlyjohnny/phoenix/internal/instance"
-	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 )
 

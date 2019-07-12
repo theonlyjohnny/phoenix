@@ -5,12 +5,17 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/theonlyjohnny/phoenix/internal/log"
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
 )
 
 var (
 	validStorages = []string{"local"}
+	log           logger.Logger
 )
+
+func init() {
+	log = logger.Log
+}
 
 //StorageConfig is an arbitrary JSON interface for use by individual clouds
 // type StorageConfig map[string]interface{}

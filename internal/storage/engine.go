@@ -3,9 +3,15 @@ package storage
 import (
 	"fmt"
 
-	"github.com/theonlyjohnny/phoenix/internal/log"
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
 	extern_storage "github.com/theonlyjohnny/phoenix/pkg/storage"
 )
+
+var log logger.Logger
+
+func init() {
+	log = logger.Log
+}
 
 type Engine struct {
 	backing extern_storage.Storage

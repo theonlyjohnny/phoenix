@@ -4,10 +4,16 @@ import (
 	"fmt"
 
 	"github.com/theonlyjohnny/phoenix/internal/config"
-	"github.com/theonlyjohnny/phoenix/internal/log"
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 	"github.com/theonlyjohnny/phoenix/pkg/cloud"
 )
+
+var log logger.Logger
+
+func init() {
+	log = logger.Log
+}
 
 type Engine struct {
 	baseCfgs      map[string]config.CloudProviderConfig

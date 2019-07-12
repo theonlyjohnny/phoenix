@@ -2,7 +2,6 @@ package storage
 
 import (
 	"github.com/theonlyjohnny/phoenix/internal/instance"
-	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 

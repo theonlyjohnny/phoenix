@@ -7,7 +7,14 @@ import (
 	"github.com/theonlyjohnny/jogger-go/logger"
 )
 
-var log *logger.Logger
+type Logger interface {
+	Debugf(string, ...interface{})
+	Infof(string, ...interface{})
+	Errorf(string, ...interface{})
+	Warnf(string, ...interface{})
+}
+
+var Log Logger
 
 func setupLogger() error {
 	opts := logger.Config{
@@ -17,7 +24,7 @@ func setupLogger() error {
 		LogSyslog:  nil,
 	}
 	var loggerErr error
-	log, loggerErr = logger.CreateLogger(opts)
+	Log, loggerErr = logger.CreateLogger(opts)
 	return loggerErr
 }
 
@@ -26,24 +33,4 @@ func init() {
 		fmt.Printf("Failed to setup logger ? %s \n", err)
 		os.Exit(1)
 	}
-}
-
-//Debugf prints an formated debug log
-func Debugf(msg string, args ...interface{}) {
-	log.Debugf(msg, args...)
-}
-
-//Infof prints an formated info log
-func Infof(msg string, args ...interface{}) {
-	log.Infof(msg, args...)
-}
-
-//Errorf prints an formated error log
-func Errorf(msg string, args ...interface{}) {
-	log.Errorf(msg, args...)
-}
-
-//Warnf prints an formated warning
-func Warnf(msg string, args ...interface{}) {
-	log.Warnf(msg, args...)
 }

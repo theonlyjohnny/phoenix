@@ -1,7 +1,5 @@
 package job
 
-import "github.com/theonlyjohnny/phoenix/internal/log"
-
 func (m *Manager) AddClusterEvent(clusterName string) {
 	//TODO per-cluster provider overrides
 	if _, err := m.cloud.GetCloudProvider(clusterName, nil); err != nil {

@@ -6,13 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/internal/job"
-	"github.com/theonlyjohnny/phoenix/internal/log"
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 )
+
+var log logger.Logger
 
 const (
 	wrapperKey = string(iota)
 )
+
+func init() {
+	log = logger.Log
+}
 
 // Start starts the HTTP server on the specified port
 func Start(cfg *config.Config, s *storage.Engine, m *job.Manager) error {

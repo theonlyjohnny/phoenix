@@ -3,7 +3,6 @@ package loop
 import (
 	"github.com/theonlyjohnny/phoenix/internal/cluster"
 	"github.com/theonlyjohnny/phoenix/internal/instance"
-	"github.com/theonlyjohnny/phoenix/internal/log"
 )
 
 type mergedInstancesDelta struct {

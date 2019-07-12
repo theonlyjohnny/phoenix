@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/theonlyjohnny/phoenix/internal/cluster"
-	"github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 

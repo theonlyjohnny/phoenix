@@ -6,9 +6,15 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/cloud"
 	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/internal/job"
-	"github.com/theonlyjohnny/phoenix/internal/log"
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 )
+
+var log logger.Logger
+
+func init() {
+	log = logger.Log
+}
 
 type phoenixLoop struct {
 	loopInterval time.Duration

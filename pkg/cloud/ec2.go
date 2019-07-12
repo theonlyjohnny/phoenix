@@ -10,14 +10,19 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/theonlyjohnny/phoenix/internal/config"
-	"github.com/theonlyjohnny/phoenix/internal/log"
 
 	"github.com/theonlyjohnny/phoenix/internal/instance"
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
 )
 
 var (
+	log               logger.Logger
 	clusterNameRegexp = regexp.MustCompile(`(?:us|ap|sa|eu)(?:n|e|s|w|c)+[0-9]-([a-z]*)-[0-9]*`)
 )
+
+func init() {
+	log = logger.Log
+}
 
 //EC2 Cloud
 type EC2 struct {
