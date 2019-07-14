@@ -1,7 +1,14 @@
+# Purpose
+This file is really a TODO more than a README. If you can see this repository, you know what this project is supposed to do
+
 ### EC2 Backend
- - [ ] Accept creds via env/file, not just config
+ - [ ] Accept credentials via env/file, not just configuration
  - [ ] multi-region?
- - [ ] Automatically set up IAM role? (ec2.describeinstances, 
+ - [ ] Automatically set up IAM role? (ec2.DescribeInstances, ec2.CreateTags, …?)
+ - [ ] Pagination
 
 ## Design
- - [ ] Move manager calls into storage so each handler doesn't have to implement? <-- Then does each storage have to implement? annoying if eventually wanna make plugins
+ - [ ] Allow cluster-level provider configuration via handler | separate POST /cluster input from cluster.Cluster struct
+ - [ ] Limit # of concurrent goroutines in job manager
+ - [ ] Keep track of which entities are scaling in job manager and cancel old goroutine if newer update comes in (`singleflight` package?)
+ - [ ] Implement `loop` logic to check if an instance has updated since its internal state last changed

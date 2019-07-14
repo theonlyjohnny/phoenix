@@ -28,6 +28,3 @@ func NewManager(storage *storage.Engine, cloud *cloud.Engine) (*Manager, error) 
 		scale.NewClusterLogic(storage, cloud),
 	}, nil
 }
-
-//TODO manage # of concurrect goroutines? <- limiting
-//TODO make events go into queue and cancelable via context.Context

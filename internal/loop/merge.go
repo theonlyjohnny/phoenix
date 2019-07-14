@@ -67,7 +67,6 @@ func (l *phoenixLoop) mergeInstances(allInstances, oldInstances instance.List) *
 
 	for _, instance := range oldInstances {
 		if _, ok := allPhoenixIDs[instance.PhoenixID]; !ok {
-			//TODO check if in creating state and skip?
 			log.Warnf("Found an instance not reported by backend -- %s", instance)
 			deadPhoenixIDs = append(deadPhoenixIDs, instance.PhoenixID)
 		}
