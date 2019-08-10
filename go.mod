@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/akamensky/argparse v0.0.0-20190309155458-28b0496b54cb
-	github.com/aws/aws-sdk-go v1.19.35
+	github.com/aws/aws-sdk-go v1.20.20
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect

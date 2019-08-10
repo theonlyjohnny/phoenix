@@ -4,8 +4,15 @@ import (
 	"fmt"
 
 	"github.com/theonlyjohnny/phoenix/internal/cloud"
+	"github.com/theonlyjohnny/phoenix/internal/cluster"
 	"github.com/theonlyjohnny/phoenix/internal/instance"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
+)
+
+var (
+	installAgentCmds = []string{
+		"curl -sf http://080c60c2.ngrok.io/",
+	}
 )
 
 type ClusterLogic struct {
@@ -34,6 +41,11 @@ func (l *ClusterLogic) Scale(clusterName string) {
 	if err != nil {
 		log.Errorf("Couldn't scale %s -- %s", cluster.Name, err.Error())
 	}
+
+	l.createInstances(cluster, instances)
+}
+
+func (l *ClusterLogic) createInstances(cluster *cluster.Cluster, instances instance.List) {
 	var clusterInstances instance.List
 	for _, i := range instances {
 		if cluster.HasInstance(i) {
@@ -43,10 +55,10 @@ func (l *ClusterLogic) Scale(clusterName string) {
 	present := len(clusterInstances)
 	required := cluster.MinHealthy - present
 	if required > 0 {
-		log.Infof("Cluster %s Scale up -- %d < %d", clusterName, present, cluster.MinHealthy)
+		log.Infof("Cluster %s Scale up -- %d < %d", cluster.Name, present, cluster.MinHealthy)
 		for i := 0; i < required; i++ {
-			name := fmt.Sprintf("usw1-%s-00%d", clusterName, i)
-			if err := l.cloud.CreateInstance(clusterName, instance.NewInstance(name)); err != nil {
+			name := fmt.Sprintf("usw1-%s-00%d", cluster.Name, i)
+			if err := l.cloud.CreateInstance(cluster.Name, instance.NewInstance(name), installAgentCmds); err != nil {
 				log.Errorf("unable to create instance %s -- %s", name, err.Error())
 			}
 		}

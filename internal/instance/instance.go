@@ -20,11 +20,15 @@ type Instance struct {
 
 	ClusterName string `json:"cluster_name"`
 
+	Location Location `json:"location"`
+
+	Status *Status `json:"status"`
+
 	UpdatedDTTM time.Time `json:"updated_dttm"`
 }
 
 func (i Instance) String() string {
-	return fmt.Sprintf("Instance{PhoenixID: %s, ExternalID: %s, Name: %s, Hostname, %s, ClusterName: %s, UpdatedDTTM: %s}", i.PhoenixID, i.ExternalID, i.Name, i.Hostname, i.ClusterName, i.UpdatedDTTM)
+	return fmt.Sprintf("Instance{PhoenixID: %s, ExternalID: %s, Name: %s, Hostname, %s, ClusterName: %s, UpdatedDTTM: %s, Location: %s}", i.PhoenixID, i.ExternalID, i.Name, i.Hostname, i.ClusterName, i.UpdatedDTTM, i.Location)
 }
 
 func NewInstance(name string) *Instance {

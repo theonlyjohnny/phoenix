@@ -28,10 +28,10 @@ func (e *Engine) GetAllInstances() (instance.List, error) {
 	return out, err
 }
 
-func (e *Engine) CreateInstance(clusterName string, newInstance *instance.Instance) error {
+func (e *Engine) CreateInstance(clusterName string, newInstance *instance.Instance, cmds []string) error {
 	provider, err := e.GetCloudProvider(clusterName, nil)
 	if err != nil {
 		return err
 	}
-	return provider.CreateInstance(newInstance)
+	return provider.CreateInstance(newInstance, cmds)
 }

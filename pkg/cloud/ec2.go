@@ -2,6 +2,7 @@ package cloud
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"regexp"
 
@@ -116,6 +117,10 @@ func (e EC2) GetAllInstances() (instance.List, error) {
 		instance := instance.Instance{
 			ExternalID: *externInstance.InstanceId,
 			Hostname:   *externInstance.PrivateDnsName,
+			Location: instance.Location{
+				Region: *e.client.Client.Config.Region,
+				Zone:   *externInstance.Placement.AvailabilityZone,
+			},
 		}
 
 		if phoenixIDTag != "" {
@@ -137,7 +142,7 @@ func (e EC2) GetAllInstances() (instance.List, error) {
 	return end, nil
 }
 
-func (e EC2) CreateInstance(i *instance.Instance) error {
+func (e EC2) CreateInstance(i *instance.Instance, cmds []string) error {
 	input := &ec2.RunInstancesInput{
 		ImageId:  aws.String("ami-0b4a9c56e9f69e9f8"),
 		MinCount: aws.Int64(1),
@@ -161,6 +166,7 @@ func (e EC2) CreateInstance(i *instance.Instance) error {
 				},
 			},
 		},
+		UserData: aws.String(base64.StdEncoding.EncodeToString([]byte("#!/bin/bash\n" + cmds[0]))),
 	}
 
 	_, err := e.client.RunInstances(input)
