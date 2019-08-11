@@ -9,8 +9,8 @@ import (
 	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/internal/job"
 	logger "github.com/theonlyjohnny/phoenix/internal/log"
-	"github.com/theonlyjohnny/phoenix/internal/loop"
 	"github.com/theonlyjohnny/phoenix/internal/server"
+	loop "github.com/theonlyjohnny/phoenix/internal/serverloop"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 )
 
