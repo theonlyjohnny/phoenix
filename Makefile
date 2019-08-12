@@ -1,21 +1,28 @@
-BINARY_NAME=phoenix
-BINARY_LOCATION=phoenix-cli
+CLI_NAME=phoenix
+CLI_LOCATION=phoenix-cli
 
-AGENT_BINARY_NAME=phoenix-agent
-AGENT_BINARY_LOCATOIN=phoenix-agent
+AGENT_NAME=phoenix-agent
+AGENT_LOCATION=phoenix-agent
 
-all: test build 
+DIST=./dist
 
-build: 
-	go build -o $(BINARY_NAME) -v ./cmd/$(BINARY_LOCATION)
-	go build -o $(AGENT_BINARY_NAME) -v ./cmd/$(AGENT_BINARY_LOCATOIN)
-test: 
+test:
 	go test -race -v ./...
-clean: 
+
+clean:
 	go clean ./...
-	rm -f $(BINARY_NAME)
-	rm -f $(AGENT_BINARY_LOCATOIN)
+	rm -f $(CLI_NAME)
+	rm -f $(AGENT_LOCATION)
+	rm -rf $(DIST)
+	mkdir $(DIST)
+
 run:
-	go run ./cmd/$(BINARY_LOCATION)
+	go run ./cmd/$(CLI_LOCATION)
 run-client:
-	go run ./cmd/$(AGENT_BINARY_LOCATOIN)
+	go run ./cmd/$(AGENT_LOCATION)
+
+build: clean
+	go build -o $(DIST)/$(CLI_NAME) -v ./cmd/$(CLI_LOCATION)
+	go build -o $(DIST)/$(AGENT_NAME) -v ./cmd/$(AGENT_LOCATION)
+
+all: test build

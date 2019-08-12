@@ -1,6 +1,9 @@
 package clientloop
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	loopInterval = time.Second * 5
@@ -16,5 +19,6 @@ func Start() {
 }
 
 func loop() {
+	fmt.Println("client loop")
 	//NOOP
 }

