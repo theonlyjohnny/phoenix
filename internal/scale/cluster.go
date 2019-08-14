@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/theonlyjohnny/phoenix/internal/cloud"
-	"github.com/theonlyjohnny/phoenix/internal/cluster"
-	"github.com/theonlyjohnny/phoenix/internal/instance"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
 
 var (
@@ -45,8 +44,8 @@ func (l *ClusterLogic) Scale(clusterName string) {
 	l.createInstances(cluster, instances)
 }
 
-func (l *ClusterLogic) createInstances(cluster *cluster.Cluster, instances instance.List) {
-	var clusterInstances instance.List
+func (l *ClusterLogic) createInstances(cluster *models.Cluster, instances models.InstanceList) {
+	var clusterInstances models.InstanceList
 	for _, i := range instances {
 		if cluster.HasInstance(i) {
 			clusterInstances = append(clusterInstances, i)
@@ -58,7 +57,7 @@ func (l *ClusterLogic) createInstances(cluster *cluster.Cluster, instances insta
 		log.Infof("Cluster %s Scale up -- %d < %d", cluster.Name, present, cluster.MinHealthy)
 		for i := 0; i < required; i++ {
 			name := fmt.Sprintf("usw1-%s-00%d", cluster.Name, i)
-			if err := l.cloud.CreateInstance(cluster.Name, instance.NewInstance(name), installAgentCmds); err != nil {
+			if err := l.cloud.CreateInstance(cluster.Name, models.NewInstance(name), installAgentCmds); err != nil {
 				log.Errorf("unable to create instance %s -- %s", name, err.Error())
 			}
 		}

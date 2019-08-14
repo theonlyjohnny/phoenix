@@ -3,20 +3,20 @@ package storage
 import (
 	"fmt"
 
-	"github.com/theonlyjohnny/phoenix/internal/cluster"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
-func (s *Engine) ListClusters() (cluster.List, error) {
+func (s *Engine) ListClusters() (models.ClusterList, error) {
 	vals, err := s.backing.List(storage.ClusterEntityType)
-	res := make(cluster.List, len(vals))
+	res := make(models.ClusterList, len(vals))
 
 	if err != nil {
 		return res, err
 	}
 
 	for i, v := range vals {
-		cluster, ok := v.(*cluster.Cluster)
+		cluster, ok := v.(*models.Cluster)
 		if ok {
 			res[i] = cluster
 		} else {
@@ -26,7 +26,7 @@ func (s *Engine) ListClusters() (cluster.List, error) {
 	return res, nil
 }
 
-func (s *Engine) StoreCluster(c *cluster.Cluster) error {
+func (s *Engine) StoreCluster(c *models.Cluster) error {
 	err := s.backing.Store(storage.ClusterEntityType, c.Name, c)
 	if err != nil {
 		return err
@@ -36,12 +36,12 @@ func (s *Engine) StoreCluster(c *cluster.Cluster) error {
 	return nil
 }
 
-func (s *Engine) GetCluster(clusterName string) (*cluster.Cluster, error) {
+func (s *Engine) GetCluster(clusterName string) (*models.Cluster, error) {
 	v, err := s.backing.Get(storage.ClusterEntityType, clusterName)
 	if err != nil {
 		return nil, err
 	}
-	cluster, ok := v.(*cluster.Cluster)
+	cluster, ok := v.(*models.Cluster)
 	if !ok {
 		return nil, fmt.Errorf("Unable to coerce %#v into *cluster.Cluster", v)
 	}

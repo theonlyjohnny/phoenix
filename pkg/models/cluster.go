@@ -1,13 +1,11 @@
-package cluster
+package models
 
 import (
 	"fmt"
-
-	"github.com/theonlyjohnny/phoenix/internal/instance"
 )
 
-//A List is a list of Cluster pointers
-type List []*Cluster
+//A ClusterList is a list of Cluster pointers
+type ClusterList []*Cluster
 
 //A Cluster represents a scaling set of Instances
 type Cluster struct {
@@ -17,7 +15,7 @@ type Cluster struct {
 }
 
 //HasInstance returns whether or not the specified Instance is a part of this Cluster
-func (c *Cluster) HasInstance(i *instance.Instance) bool {
+func (c *Cluster) HasInstance(i *Instance) bool {
 	return i.ClusterName == c.Name
 }
 

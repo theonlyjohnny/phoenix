@@ -1,18 +1,18 @@
 package storage
 
 import (
-	"github.com/theonlyjohnny/phoenix/internal/instance"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
-func (s *Engine) ListInstances() (instance.List, error) {
+func (s *Engine) ListInstances() (models.InstanceList, error) {
 	vals, err := s.backing.List(storage.InstanceEntityType)
-	res := make(instance.List, len(vals))
+	res := make(models.InstanceList, len(vals))
 	if err != nil {
 		return res, err
 	}
 	for i, v := range vals {
-		instance, ok := v.(*instance.Instance)
+		instance, ok := v.(*models.Instance)
 		if ok {
 			res[i] = instance
 		} else {
@@ -26,6 +26,6 @@ func (s *Engine) DeleteInstance(key string) error {
 	return s.backing.Delete(storage.InstanceEntityType, key)
 }
 
-func (s *Engine) StoreInstance(i *instance.Instance) error {
+func (s *Engine) StoreInstance(i *models.Instance) error {
 	return s.backing.Store(storage.InstanceEntityType, i.PhoenixID, i)
 }

@@ -3,11 +3,11 @@ package cloud
 import (
 	"fmt"
 
-	"github.com/theonlyjohnny/phoenix/internal/instance"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
 
-func (e *Engine) GetAllInstances() (instance.List, error) {
-	var out instance.List
+func (e *Engine) GetAllInstances() (models.InstanceList, error) {
+	var out models.InstanceList
 	var sumErr string
 
 	for clusterName, provider := range e.providerCache {
@@ -28,7 +28,7 @@ func (e *Engine) GetAllInstances() (instance.List, error) {
 	return out, err
 }
 
-func (e *Engine) CreateInstance(clusterName string, newInstance *instance.Instance, cmds []string) error {
+func (e *Engine) CreateInstance(clusterName string, newInstance *models.Instance, cmds []string) error {
 	provider, err := e.GetCloudProvider(clusterName, nil)
 	if err != nil {
 		return err

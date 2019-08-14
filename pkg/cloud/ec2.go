@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/theonlyjohnny/phoenix/internal/config"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 
-	"github.com/theonlyjohnny/phoenix/internal/instance"
 	logger "github.com/theonlyjohnny/phoenix/internal/log"
 )
 
@@ -77,8 +77,8 @@ func NewEC2CloudProvider(cfg config.CloudProviderConfig) (EC2, error) {
 	return e, nil
 }
 
-func (e EC2) GetAllInstances() (instance.List, error) {
-	var end instance.List
+func (e EC2) GetAllInstances() (models.InstanceList, error) {
+	var end models.InstanceList
 	max := int64(1000)
 	input := &ec2.DescribeInstancesInput{
 		MaxResults: &max, //max -- TODO pagination
@@ -114,10 +114,10 @@ func (e EC2) GetAllInstances() (instance.List, error) {
 			}
 		}
 
-		instance := instance.Instance{
+		instance := models.Instance{
 			ExternalID: *externInstance.InstanceId,
 			Hostname:   *externInstance.PrivateDnsName,
-			Location: instance.Location{
+			Location: models.Location{
 				Region: *e.client.Client.Config.Region,
 				Zone:   *externInstance.Placement.AvailabilityZone,
 			},
@@ -142,7 +142,7 @@ func (e EC2) GetAllInstances() (instance.List, error) {
 	return end, nil
 }
 
-func (e EC2) CreateInstance(i *instance.Instance, cmds []string) error {
+func (e EC2) CreateInstance(i *models.Instance, cmds []string) error {
 	input := &ec2.RunInstancesInput{
 		ImageId:  aws.String("ami-0b4a9c56e9f69e9f8"),
 		MinCount: aws.Int64(1),

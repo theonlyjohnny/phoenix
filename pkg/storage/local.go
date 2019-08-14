@@ -4,26 +4,25 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/theonlyjohnny/phoenix/internal/cluster"
-	"github.com/theonlyjohnny/phoenix/internal/instance"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
 
 var (
-	instanceCache map[string]*instance.Instance
-	clusterCache  map[string]*cluster.Cluster
+	instanceCache map[string]*models.Instance
+	clusterCache  map[string]*models.Cluster
 	mutex         sync.RWMutex
 )
 
 //LocalStorage is an in-memory Storage implementation -- DO NOT USE IN PRODUCTION
 type LocalStorage struct {
-	instanceCache *map[string]*instance.Instance
-	clusterCache  *map[string]*cluster.Cluster
+	instanceCache *map[string]*models.Instance
+	clusterCache  *map[string]*models.Cluster
 	mutex         *sync.RWMutex
 }
 
 func init() {
-	instanceCache = make(map[string]*instance.Instance)
-	clusterCache = make(map[string]*cluster.Cluster)
+	instanceCache = make(map[string]*models.Instance)
+	clusterCache = make(map[string]*models.Cluster)
 }
 
 func NewLocalStorage() (LocalStorage, error) {
@@ -39,13 +38,13 @@ func (s LocalStorage) Store(t EntityType, key string, v interface{}) error {
 	defer s.mutex.Unlock()
 	switch t {
 	case InstanceEntityType:
-		i, ok := v.(*instance.Instance)
+		i, ok := v.(*models.Instance)
 		if !ok {
 			return fmt.Errorf("Told to save instance but value was not instance")
 		}
 		(*s.instanceCache)[key] = i
 	case ClusterEntityType:
-		c, ok := v.(*cluster.Cluster)
+		c, ok := v.(*models.Cluster)
 		if !ok {
 			return fmt.Errorf("Told to save cluster but value was not cluster")
 		}

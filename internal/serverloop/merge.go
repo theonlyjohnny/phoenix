@@ -1,27 +1,24 @@
 package loop
 
-import (
-	"github.com/theonlyjohnny/phoenix/internal/cluster"
-	"github.com/theonlyjohnny/phoenix/internal/instance"
-)
+import "github.com/theonlyjohnny/phoenix/pkg/models"
 
 type mergedInstancesDelta struct {
-	instanceUpdates instance.List
+	instanceUpdates models.InstanceList
 	deadPhoenixIDs  []string
 }
 
-func (l *phoenixLoop) mergeInstances(allInstances, oldInstances instance.List) *mergedInstancesDelta {
+func (l *phoenixLoop) mergeInstances(allInstances, oldInstances models.InstanceList) *mergedInstancesDelta {
 	s := l.storage
 	clusters, err := s.ListClusters()
 	if err != nil {
 		log.Errorf("unable to list clusters and thus unable to merge instances -- %s", err.Error())
 	}
 
-	updatedInstances := instance.List{}
+	updatedInstances := models.InstanceList{}
 	deadPhoenixIDs := []string{}
 
-	relevantInstancesIDMap := map[string]*instance.Instance{}
-	oldPhoenixIDs := map[string]*instance.Instance{}
+	relevantInstancesIDMap := map[string]*models.Instance{}
+	oldPhoenixIDs := map[string]*models.Instance{}
 	allPhoenixIDs := map[string]bool{}
 
 	for _, oldInstance := range oldInstances {
@@ -35,7 +32,7 @@ func (l *phoenixLoop) mergeInstances(allInstances, oldInstances instance.List) *
 	log.Debugf("merging all: %v and old: %v", allInstances, oldInstances)
 
 	for _, instance := range allInstances {
-		var instanceCluster *cluster.Cluster
+		var instanceCluster *models.Cluster
 
 		for _, potentialCluster := range clusters {
 			if potentialCluster.HasInstance(instance) {
