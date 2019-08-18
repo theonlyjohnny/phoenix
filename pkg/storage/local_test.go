@@ -266,7 +266,7 @@ func testListInstances(t *testing.T) {
 		instances[i] = instance
 	}
 
-	assert.Equal(t, tests, instances)
+	assert.ElementsMatch(t, tests, instances)
 
 }
 
@@ -295,7 +295,7 @@ func testListClusters(t *testing.T) {
 		clusters[i] = cluster
 	}
 
-	assert.Equal(t, tests, clusters)
+	assert.ElementsMatch(t, tests, clusters)
 
 }
 
