@@ -10,7 +10,7 @@ TEST_OUTPUT=/tmp/phoenix/test_output
 
 test:
 	mkdir -p $(TEST_OUTPUT)
-	TEST_OUTPUT=$(TEST_OUTPUT) go test ./... -coverprofile=$(TEST_OUTPUT)/phoenix_coverage.out -covermode=count -v=1
+	TEST_OUTPUT=$(TEST_OUTPUT) go test -race ./... -coverprofile=$(TEST_OUTPUT)/phoenix_coverage.out -covermode=atomic
 
 coverage: test
 	go tool cover -html=$(TEST_OUTPUT)/phoenix_coverage.out

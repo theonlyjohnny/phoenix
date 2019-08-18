@@ -7,11 +7,11 @@ import (
 	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
 
-var (
-	instanceCache map[string]*models.Instance
-	clusterCache  map[string]*models.Cluster
-	mutex         sync.RWMutex
-)
+// var (
+// instanceCache map[string]*models.Instance
+// clusterCache  map[string]*models.Cluster
+// mutex         sync.RWMutex
+// )
 
 //LocalStorage is an in-memory Storage implementation -- DO NOT USE IN PRODUCTION
 type LocalStorage struct {
@@ -20,12 +20,11 @@ type LocalStorage struct {
 	mutex         *sync.RWMutex
 }
 
-func init() {
-	instanceCache = make(map[string]*models.Instance)
-	clusterCache = make(map[string]*models.Cluster)
-}
-
 func NewLocalStorage() (LocalStorage, error) {
+	instanceCache := make(map[string]*models.Instance)
+	clusterCache := make(map[string]*models.Cluster)
+	var mutex sync.RWMutex
+
 	return LocalStorage{
 		&instanceCache,
 		&clusterCache,
@@ -72,14 +71,21 @@ func (s LocalStorage) Delete(t EntityType, key string) error {
 func (s LocalStorage) Get(t EntityType, key string) (interface{}, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
+
 	var res interface{}
+	var ok bool
+
 	switch t {
 	case InstanceEntityType:
-		res = (*s.instanceCache)[key]
+		res, ok = (*s.instanceCache)[key]
 	case ClusterEntityType:
-		res = (*s.clusterCache)[key]
+		res, ok = (*s.clusterCache)[key]
 	default:
-		return res, fmt.Errorf("Unkown EntityType: %s", t)
+		return nil, fmt.Errorf("Unkown EntityType: %s", t)
+	}
+
+	if !ok {
+		return nil, fmt.Errorf("Invalid key %s for type %s", key, t)
 	}
 	return res, nil
 }
@@ -98,7 +104,7 @@ func (s LocalStorage) List(t EntityType) ([]interface{}, error) {
 			res = append(res, cluster)
 		}
 	default:
-		return res, fmt.Errorf("Unkown EntityType: %s", t)
+		return nil, fmt.Errorf("Unkown EntityType: %s", t)
 	}
 	return res, nil
 }
