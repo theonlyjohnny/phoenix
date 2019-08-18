@@ -1,9 +1,8 @@
-package cloud
+package ec2
 
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -31,31 +30,14 @@ type EC2 struct {
 	ctx    context.Context
 }
 
-func getStrFromCfg(cfg config.CloudProviderConfig, k string) (string, error) {
-	var res string
-	if interf, ok := cfg[k]; ok {
-		if cfgStr, ok := interf.(string); ok {
-			if cfgStr == "" {
-				return res, fmt.Errorf("cloud_config.%s cannot be an empty string", k)
-			}
-			res = cfgStr
-		} else {
-			return res, fmt.Errorf("cloud_config.%s is not a string", k)
-		}
-	} else {
-		return res, fmt.Errorf("When using the EC2 cloud, cloud_config.%s is a required parameter", k)
-	}
-	return res, nil
-}
-
 func NewEC2CloudProvider(cfg config.CloudProviderConfig) (EC2, error) {
 	var e EC2
 	errs := make([]error, 3)
-	awsID, err := getStrFromCfg(cfg, "AWS_ACCESS_KEY_ID")
+	awsID, err := cfg.GetStr("AWS_ACCESS_KEY_ID")
 	errs = append(errs, err)
-	awsSecret, err := getStrFromCfg(cfg, "AWS_SECRET_ACCESS_KEY")
+	awsSecret, err := cfg.GetStr("AWS_SECRET_ACCESS_KEY")
 	errs = append(errs, err)
-	awsRegion, err := getStrFromCfg(cfg, "AWS_REGION")
+	awsRegion, err := cfg.GetStr("AWS_REGION")
 	errs = append(errs, err)
 
 	for _, er := range errs {

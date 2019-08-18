@@ -7,6 +7,7 @@ import (
 	logger "github.com/theonlyjohnny/phoenix/internal/log"
 	"github.com/theonlyjohnny/phoenix/internal/storage"
 	"github.com/theonlyjohnny/phoenix/pkg/cloud"
+	"github.com/theonlyjohnny/phoenix/pkg/cloud/ec2"
 )
 
 var log logger.Logger
@@ -58,7 +59,7 @@ func (e *Engine) GetCloudProvider(clusterName string, cfg *config.CloudProviderC
 
 	switch providerType {
 	case "ec2":
-		provider, err = cloud.NewEC2CloudProvider(finalCfg)
+		provider, err = ec2.NewEC2CloudProvider(finalCfg)
 	default:
 		log.Errorf("Unable to find cloud provider with type %s", providerType)
 		return provider, fmt.Errorf("unknown provider: %s", providerType)

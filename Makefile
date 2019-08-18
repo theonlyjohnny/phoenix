@@ -6,8 +6,14 @@ AGENT_LOCATION=phoenix-agent
 
 DIST=./dist
 
+TEST_OUTPUT=/tmp/phoenix/test_output
+
 test:
-	go test -race -v ./...
+	mkdir -p $(TEST_OUTPUT)
+	TEST_OUTPUT=$(TEST_OUTPUT) go test ./... -coverprofile=$(TEST_OUTPUT)/phoenix_coverage.out -covermode=count -v=1
+
+coverage: test
+	go tool cover -html=$(TEST_OUTPUT)/phoenix_coverage.out
 
 clean:
 	go clean ./...
