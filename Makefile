@@ -1,5 +1,5 @@
-CLI_NAME=phoenix
-CLI_LOCATION=phoenix-cli
+SERVER_NAME=phoenix
+SERVER_LOCATION=phoenix
 
 AGENT_NAME=phoenix-agent
 AGENT_LOCATION=phoenix-agent
@@ -17,23 +17,23 @@ coverage: test
 
 clean:
 	go clean ./...
-	rm -f $(CLI_NAME)
+	rm -f $(SERVER_NAME)
 	rm -f $(AGENT_LOCATION)
 	rm -rf $(DIST)
 	mkdir $(DIST)
 
 run:
-	go run ./cmd/$(CLI_LOCATION)
+	go run ./cmd/$(SERVER_LOCATION)
 run-client:
 	go run ./cmd/$(AGENT_LOCATION)
 
 run-all:
 	go run ./cmd/$(AGENT_LOCATION) &
-	go run ./cmd/$(CLI_LOCATION)
+	go run ./cmd/$(SERVER_LOCATION)
 
 
 build: clean
-	go build -o $(DIST)/$(CLI_NAME) -v ./cmd/$(CLI_LOCATION)
+	go build -o $(DIST)/$(SERVER_NAME) -v ./cmd/$(SERVER_LOCATION)
 	go build -o $(DIST)/$(AGENT_NAME) -v ./cmd/$(AGENT_LOCATION)
 
 all: test build
