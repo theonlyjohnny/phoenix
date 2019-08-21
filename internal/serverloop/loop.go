@@ -63,29 +63,9 @@ func (l *phoenixLoop) tick() {
 }
 
 func (l *phoenixLoop) updateInstances() {
-	s := l.storage
-	c := l.cloud
-	allInstances, err := c.GetAllInstances()
+	err := l.manager.UpdateInstances()
 	if err != nil {
-		log.Errorf("Couldn't get all new instances -- %s", err.Error())
+		log.Errorf("Couldn't update instances as part of normal loop -- %s", err.Error())
 		return
-	}
-	oldInstances, err := s.ListInstances()
-	if err != nil {
-		log.Errorf("Couldn't get all old instances -- %s", err.Error())
-		return
-	}
-	delta := l.mergeInstances(allInstances, oldInstances)
-
-	for _, oldPhoenixID := range delta.deadPhoenixIDs {
-		if err := s.DeleteInstance(oldPhoenixID); err != nil {
-			log.Errorf("Unable to delete instance %s from storage -- %s", oldPhoenixID, err.Error())
-		}
-	}
-
-	for _, instance := range delta.instanceUpdates {
-		if err := s.StoreInstance(instance); err != nil {
-			log.Errorf("Unable to store instance %s to storage -- %s", instance, err.Error())
-		}
 	}
 }

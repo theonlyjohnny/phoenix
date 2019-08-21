@@ -39,8 +39,8 @@ type Instance struct {
 
 func (i Instance) String() string {
 	return fmt.Sprintf("Instance{PhoenixID: %s, ExternalID: %s, Name: %s, Hostname, %s, ClusterName: %s, UpdatedDTTM: %s, Location: %s}",
-		i.Name,
-		i.PhoenixID, i.ExternalID,
+		i.PhoenixID,
+		i.ExternalID, i.Name,
 		i.Hostname, i.ClusterName,
 		i.UpdatedDTTM, i.Location,
 	)

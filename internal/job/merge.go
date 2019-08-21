@@ -1,4 +1,4 @@
-package loop
+package job
 
 import "github.com/theonlyjohnny/phoenix/pkg/models"
 
@@ -7,8 +7,8 @@ type mergedInstancesDelta struct {
 	deadPhoenixIDs  []string
 }
 
-func (l *phoenixLoop) mergeInstances(allInstances, oldInstances models.InstanceList) *mergedInstancesDelta {
-	s := l.storage
+func (m *Manager) mergeInstances(allInstances, oldInstances models.InstanceList) *mergedInstancesDelta {
+	s := m.storage
 	clusters, err := s.ListClusters()
 	if err != nil {
 		log.Errorf("unable to list clusters and thus unable to merge instances -- %s", err.Error())

@@ -35,6 +35,7 @@ func NewLocalStorage() (LocalStorage, error) {
 func (s LocalStorage) Store(t EntityType, key string, v interface{}) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
+
 	switch t {
 	case InstanceEntityType:
 		i, ok := v.(*models.Instance)
