@@ -27,6 +27,11 @@ run:
 run-client:
 	go run ./cmd/$(AGENT_LOCATION)
 
+run-all:
+	go run ./cmd/$(AGENT_LOCATION) &
+	go run ./cmd/$(CLI_LOCATION)
+
+
 build: clean
 	go build -o $(DIST)/$(CLI_NAME) -v ./cmd/$(CLI_LOCATION)
 	go build -o $(DIST)/$(AGENT_NAME) -v ./cmd/$(AGENT_LOCATION)

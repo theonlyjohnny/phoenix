@@ -37,6 +37,9 @@ func Start(cfg *config.Config, s *storage.Engine, m *job.Manager) error {
 	cluster := api.Group("/cluster")
 	cluster.POST("/", unWrapHandler(postClusterHandler))
 
+	status := api.Group("/status")
+	status.POST("/", unWrapHandler(postStatusHandler))
+
 	r.Run(fmt.Sprintf(":%d", port))
 	return nil
 }

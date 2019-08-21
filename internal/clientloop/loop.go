@@ -1,24 +1,76 @@
 package clientloop
 
 import (
-	"fmt"
+	"net/http"
+	"net/url"
 	"time"
+
+	logger "github.com/theonlyjohnny/phoenix/internal/log"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
+
+var log logger.Logger
+
+func init() {
+	log = logger.Log
+}
 
 const (
 	loopInterval = time.Second * 5
 )
 
-func Start() {
+type clientLooper struct {
+	ticker *time.Ticker
+	http   *http.Client
 
-	ticker := time.NewTicker(loopInterval)
+	phoenixID      string
+	serverLocation *url.URL
+}
 
-	for range ticker.C {
-		loop()
+func Start(phoenixID string, serverLocation *url.URL) {
+
+	client := getNewHTTPClient()
+
+	clientLoop := clientLooper{
+		time.NewTicker(loopInterval),
+		client,
+		phoenixID,
+		serverLocation,
+	}
+
+	clientLoop.start()
+
+}
+
+func (l *clientLooper) start() {
+	for range l.ticker.C {
+		l.loop()
 	}
 }
 
-func loop() {
-	fmt.Println("client loop")
-	//NOOP
+func (l *clientLooper) loop() {
+	status, err := l.determineStatus()
+	if err != nil {
+		log.Errorf("Unable to determine status -- %s", err.Error())
+		return
+	}
+	err = l.sendStatus(status)
+	if err != nil {
+		log.Errorf("Unable to send status -- %s", err.Error())
+		return
+	}
+	log.Debugf("Successfully sent status to server")
+}
+
+func (l *clientLooper) determineStatus() (models.Status, error) {
+	//TODO
+	return models.Status{
+		CPUUsage: 50.0,
+		MemUsage: 10.0,
+		Healthy:  true,
+	}, nil
+}
+
+func (l *clientLooper) sendStatus(status models.Status) error {
+	return l.postHTTP("status", status)
 }

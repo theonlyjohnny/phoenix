@@ -7,9 +7,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-//A Status represents the state reported by the PhoenixAgent -- TODO
-type Status struct{}
-
 //A Location represents an Instances deployment location
 type Location struct {
 	Region string `json:"region"`

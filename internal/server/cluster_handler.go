@@ -12,11 +12,14 @@ import (
 func postClusterHandler(c *gin.Context, storage *storage.Engine, manager *job.Manager) {
 	var cluster models.Cluster
 	if err := c.ShouldBindJSON(&cluster); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": err.Error()})
 		return
 	}
 
-	storage.StoreCluster(&cluster)
+	if err := storage.StoreCluster(&cluster); err != nil {
+		c.JSON(500, gin.H{"code": 500, "message": err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{})
 	manager.AddClusterEvent(cluster.Name)

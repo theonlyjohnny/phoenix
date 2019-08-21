@@ -13,3 +13,4 @@ This file is really a TODO more than a README. If you can see this repository, y
  - [ ] Keep track of which entities are scaling in job manager and cancel old goroutine if newer update comes in (`singleflight` package?)
  - [ ] Implement `loop` logic to check if an instance has updated since its internal state last changed
  - [ ] Add Provisioner interface (salt, puppet, ansible, etc.) to install Phoenix agent and configure instance (instead of user data in EC2 provider)
+ - [ ] Implement auth between client <-> server to validate client is who they say they are
