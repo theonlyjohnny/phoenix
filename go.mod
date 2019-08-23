@@ -7,11 +7,14 @@ require (
 	github.com/aws/aws-sdk-go v1.23.5
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gin-gonic/gin v1.4.1-0.20190816011044-9a820cf0054b
+	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
+	github.com/onsi/ginkgo v1.9.0 // indirect
+	github.com/onsi/gomega v1.6.0 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	github.com/stretchr/testify v1.4.0

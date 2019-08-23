@@ -1,17 +1,20 @@
 package storage
 
-//EntityType is used to distinguish what kind of entity is being stored
-type EntityType string
-
-const (
-	InstanceEntityType = EntityType("Instance")
-	ClusterEntityType  = EntityType("Cluster")
-)
+import "github.com/theonlyjohnny/phoenix/pkg/models"
 
 //Storage stores interfaces to some (ideally remote) persistent storage
 type Storage interface {
-	Store(EntityType, string, interface{}) error
-	List(EntityType) ([]interface{}, error)
-	Get(EntityType, string) (interface{}, error)
-	Delete(EntityType, string) error
+	StoreCluster(string, *models.Cluster) error //TODO remove the key from this interface as it can be inferred from the type? but then how does Get know what key to use...
+	StoreInstance(string, *models.Instance) error
+
+	ListClusters() (models.ClusterList, error)
+	ListInstances() (models.InstanceList, error)
+
+	GetCluster(string) (*models.Cluster, error)
+	GetInstance(string) (*models.Instance, error)
+
+	DeleteCluster(string) error
+	DeleteInstance(string) error
+
+	Flush() error
 }

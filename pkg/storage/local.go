@@ -7,105 +7,107 @@ import (
 	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
 
-// var (
-// instanceCache map[string]*models.Instance
-// clusterCache  map[string]*models.Cluster
-// mutex         sync.RWMutex
-// )
-
 //LocalStorage is an in-memory Storage implementation -- DO NOT USE IN PRODUCTION
 type LocalStorage struct {
-	instanceCache *map[string]*models.Instance
-	clusterCache  *map[string]*models.Cluster
+	instanceCache map[string]*models.Instance
+	clusterCache  map[string]*models.Cluster
 	mutex         *sync.RWMutex
 }
 
-func NewLocalStorage() (LocalStorage, error) {
+func NewLocalStorage() (Storage, error) {
 	instanceCache := make(map[string]*models.Instance)
 	clusterCache := make(map[string]*models.Cluster)
 	var mutex sync.RWMutex
 
-	return LocalStorage{
-		&instanceCache,
-		&clusterCache,
+	return &LocalStorage{
+		instanceCache,
+		clusterCache,
 		&mutex,
 	}, nil
 }
 
-func (s LocalStorage) Store(t EntityType, key string, v interface{}) error {
+func (s *LocalStorage) StoreCluster(key string, v *models.Cluster) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	switch t {
-	case InstanceEntityType:
-		i, ok := v.(*models.Instance)
-		if !ok {
-			return fmt.Errorf("Told to save instance but value was not instance")
-		}
-		(*s.instanceCache)[key] = i
-	case ClusterEntityType:
-		c, ok := v.(*models.Cluster)
-		if !ok {
-			return fmt.Errorf("Told to save cluster but value was not cluster")
-		}
-		(*s.clusterCache)[key] = c
-	default:
-		return fmt.Errorf("Unknown EntityType: %s", t)
-	}
+	s.clusterCache[key] = v
 	return nil
 }
 
-func (s LocalStorage) Delete(t EntityType, key string) error {
+func (s *LocalStorage) StoreInstance(key string, v *models.Instance) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	switch t {
-	case InstanceEntityType:
-		delete(*s.instanceCache, key)
-	case ClusterEntityType:
-		delete(*s.clusterCache, key)
-	default:
-		return fmt.Errorf("Unkown EntityType: %s", t)
-	}
+
+	s.instanceCache[key] = v
 	return nil
 }
 
-func (s LocalStorage) Get(t EntityType, key string) (interface{}, error) {
+func (s *LocalStorage) DeleteCluster(key string) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	delete(s.clusterCache, key)
+	return nil
+}
+
+func (s *LocalStorage) DeleteInstance(key string) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	delete(s.instanceCache, key)
+	return nil
+}
+
+func (s *LocalStorage) GetCluster(key string) (*models.Cluster, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	var res interface{}
-	var ok bool
-
-	switch t {
-	case InstanceEntityType:
-		res, ok = (*s.instanceCache)[key]
-	case ClusterEntityType:
-		res, ok = (*s.clusterCache)[key]
-	default:
-		return nil, fmt.Errorf("Unkown EntityType: %s", t)
-	}
+	res, ok := s.clusterCache[key]
 
 	if !ok {
-		return nil, fmt.Errorf("Invalid key %s for type %s", key, t)
+		return nil, fmt.Errorf("Invalid key %s", key)
 	}
+
 	return res, nil
 }
 
-func (s LocalStorage) List(t EntityType) ([]interface{}, error) {
+func (s *LocalStorage) GetInstance(key string) (*models.Instance, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	res := []interface{}{}
-	switch t {
-	case InstanceEntityType:
-		for _, instance := range *s.instanceCache {
-			res = append(res, instance)
-		}
-	case ClusterEntityType:
-		for _, cluster := range *s.clusterCache {
-			res = append(res, cluster)
-		}
-	default:
-		return nil, fmt.Errorf("Unkown EntityType: %s", t)
+
+	res, ok := s.instanceCache[key]
+
+	if !ok {
+		return nil, fmt.Errorf("Invalid key %s", key)
 	}
+
 	return res, nil
+}
+
+func (s *LocalStorage) ListClusters() (models.ClusterList, error) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	res := models.ClusterList{}
+
+	for _, cluster := range s.clusterCache {
+		res = append(res, cluster)
+	}
+
+	return res, nil
+}
+
+func (s *LocalStorage) ListInstances() (models.InstanceList, error) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	res := models.InstanceList{}
+
+	for _, instance := range s.instanceCache {
+		res = append(res, instance)
+	}
+
+	return res, nil
+}
+
+func (s *LocalStorage) Flush() error {
+	s.instanceCache = make(map[string]*models.Instance)
+	s.clusterCache = make(map[string]*models.Cluster)
+	return nil
 }
