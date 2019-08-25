@@ -19,10 +19,10 @@ func (cpc ComponentConfig) GetStr(k string) (string, error) {
 		if cpcStr, ok := interf.(string); ok {
 			res = cpcStr
 		} else {
-			return res, fmt.Errorf("cloud_config.%s is not a string", k)
+			return res, fmt.Errorf("config.%s is not a string", k)
 		}
 	} else {
-		return "", fmt.Errorf("cloud_config.%s not found", k)
+		return "", fmt.Errorf("config.%s not found", k)
 	}
 	return res, nil
 }
@@ -34,10 +34,10 @@ func (cpc ComponentConfig) GetInt(k string) (int, error) {
 		if cpcStr, ok := interf.(int); ok {
 			res = cpcStr
 		} else {
-			return res, fmt.Errorf("cloud_config.%s is not a int", k)
+			return res, fmt.Errorf("config.%s is not a int", k)
 		}
 	} else {
-		return res, fmt.Errorf("cloud_config.%s is a required parameter", k)
+		return res, fmt.Errorf("config.%s is a required parameter", k)
 	}
 	return res, nil
 }
@@ -49,10 +49,10 @@ func (cpc ComponentConfig) GetNestedConfigComponent(k string) (ComponentConfig, 
 		if cpcStr, ok := interf.(ComponentConfig); ok {
 			res = cpcStr
 		} else {
-			return res, fmt.Errorf("cloud_config.%s is not a nested config", k)
+			return res, fmt.Errorf("config.%s is not a nested config", k)
 		}
 	} else {
-		return nil, fmt.Errorf("cloud_config.%s not found", k)
+		return nil, fmt.Errorf("config.%s not found", k)
 	}
 	return res, nil
 }
