@@ -26,7 +26,7 @@ type Config struct {
 	Port         int           `json:"port"`
 	LoopInterval time.Duration `json:"loop_interval_ns"`
 
-	CloudProviderConfig map[string]CloudProviderConfig `json:"cloud_config"`
+	CloudProviderConfig map[string]ComponentConfig `json:"cloud_config"`
 	CloudType           string                     `json:"cloud_type"`
 
 	StorageType   string          `json:"storage_type"`

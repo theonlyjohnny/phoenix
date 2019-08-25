@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/alicebob/miniredis"
 	"github.com/go-redis/redis"
 	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/pkg/models"
@@ -20,11 +21,11 @@ func NewRedisStorage(cfg config.ComponentConfig) (storage.Storage, error) {
 	clusterDBConfig := defaultConfig(0)
 	instanceDBConfig := defaultConfig(1)
 
-	if passedClusterCfg, err := cfg.GetNestedConfigComponent("cluster"); err != nil {
+	if passedClusterCfg, err := cfg.GetNestedConfigComponent("cluster"); err == nil {
 		clusterDBConfig = clusterDBConfig.Extend(passedClusterCfg)
 	}
 
-	if passedInstanceCfg, err := cfg.GetNestedConfigComponent("instance"); err != nil {
+	if passedInstanceCfg, err := cfg.GetNestedConfigComponent("instance"); err == nil {
 		instanceDBConfig = instanceDBConfig.Extend(passedInstanceCfg)
 	}
 
@@ -253,15 +254,25 @@ func (r *RedisStorage) DeleteCluster(key string) error {
 }
 
 func CreateTestDB() config.ComponentConfig {
+	instanceDB, err := miniredis.Run()
+	if err != nil {
+		fmt.Printf("Unable to create miniredis for instances -- %s \n", err.Error())
+	}
+
+	clusterDB, err := miniredis.Run()
+	if err != nil {
+		fmt.Printf("Unable to create miniredis for clusters -- %s \n", err.Error())
+	}
+
 	return config.ComponentConfig{
 		"instance": config.ComponentConfig{
 			"db":       0,
-			"address":  "",
+			"address":  instanceDB.Addr(),
 			"password": "",
 		},
 		"cluster": config.ComponentConfig{
 			"db":       0,
-			"address":  "",
+			"address":  clusterDB.Addr(),
 			"password": "",
 		},
 	}
