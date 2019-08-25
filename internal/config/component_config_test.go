@@ -14,7 +14,7 @@ func TestGetStrFromCfg(t *testing.T) {
 }
 
 func testGetStrFromCfgValid(t *testing.T) {
-	cfg := CloudProviderConfig{
+	cfg := ComponentConfig{
 		"foo": "bar",
 	}
 
@@ -25,7 +25,7 @@ func testGetStrFromCfgValid(t *testing.T) {
 }
 
 func testGetStrFromCfgMissing(t *testing.T) {
-	cfg := CloudProviderConfig{}
+	cfg := ComponentConfig{}
 
 	res, err := cfg.GetStr("foo")
 
@@ -34,7 +34,7 @@ func testGetStrFromCfgMissing(t *testing.T) {
 }
 
 func testGetStrFromCfgNotStr(t *testing.T) {
-	cfg := CloudProviderConfig{
+	cfg := ComponentConfig{
 		"foo": map[string]string{"bar": "bar"},
 	}
 
@@ -45,13 +45,13 @@ func testGetStrFromCfgNotStr(t *testing.T) {
 }
 
 func testGetStrFromCfgEmptyStr(t *testing.T) {
-	cfg := CloudProviderConfig{
+	cfg := ComponentConfig{
 		"foo": "",
 	}
 
 	res, err := cfg.GetStr("foo")
 
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	assert.Empty(t, res)
 }
 
@@ -63,19 +63,19 @@ func TestExtend(t *testing.T) {
 }
 
 func testExtendWithEmpty(t *testing.T) {
-	base := CloudProviderConfig{
+	base := ComponentConfig{
 		"foo": "bar",
 	}
 
-	extension := CloudProviderConfig{}
+	extension := ComponentConfig{}
 
 	assert.Equal(t, base, base.Extend(extension))
 }
 
 func testExtendOnEmpty(t *testing.T) {
-	base := CloudProviderConfig{}
+	base := ComponentConfig{}
 
-	extension := CloudProviderConfig{
+	extension := ComponentConfig{
 		"foo": "bar",
 	}
 
@@ -83,11 +83,11 @@ func testExtendOnEmpty(t *testing.T) {
 }
 
 func testExtendOverwrite(t *testing.T) {
-	base := CloudProviderConfig{
+	base := ComponentConfig{
 		"foo": "bar1",
 	}
 
-	extension := CloudProviderConfig{
+	extension := ComponentConfig{
 		"foo": "bar",
 	}
 
@@ -95,13 +95,13 @@ func testExtendOverwrite(t *testing.T) {
 }
 
 func testExtendOverwriteComplex(t *testing.T) {
-	base := CloudProviderConfig{
+	base := ComponentConfig{
 		"foo": map[string]string{
 			"foo1": "bar1",
 		},
 	}
 
-	extension := CloudProviderConfig{
+	extension := ComponentConfig{
 		"foo": "bar",
 	}
 

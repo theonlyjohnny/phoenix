@@ -26,7 +26,7 @@ func main() {
 
 	cfg := config.ReadConfigFromFs(*s)
 
-	storage, err := storage.NewStorageEngine(cfg.StorageType)
+	storage, err := storage.NewStorageEngine(cfg)
 	if err != nil {
 		log.Errorf("unable to create storage -- exiting -- %s", err.Error())
 		os.Exit(1)

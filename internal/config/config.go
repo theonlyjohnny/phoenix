@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	validStorages = []string{"local"}
+	validStorages = []string{"redis"}
+	validClouds   = []string{"ec2"}
 	log           logger.Logger
 )
 
@@ -25,11 +26,11 @@ type Config struct {
 	Port         int           `json:"port"`
 	LoopInterval time.Duration `json:"loop_interval_ns"`
 
-	CloudType           string                         `json:"cloud_type"`
 	CloudProviderConfig map[string]CloudProviderConfig `json:"cloud_config"`
+	CloudType           string                     `json:"cloud_type"`
 
-	StorageType string `json:"storage_type"`
-	// StorageConfig StorageConfig `json:"storage_config"`
+	StorageType   string          `json:"storage_type"`
+	StorageConfig ComponentConfig `json:"storage_config"`
 }
 
 func defaultConfig() *Config {
@@ -37,8 +38,9 @@ func defaultConfig() *Config {
 		Port:                9000,
 		LoopInterval:        time.Second * 10,
 		CloudType:           "ec2",
-		CloudProviderConfig: map[string]CloudProviderConfig{},
+		CloudProviderConfig: map[string]ComponentConfig{},
 		StorageType:         "local",
+		StorageConfig:       ComponentConfig{},
 	}
 }
 

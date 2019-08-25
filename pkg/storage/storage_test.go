@@ -1,4 +1,4 @@
-package storage
+package storage_test
 
 import (
 	"fmt"
@@ -6,64 +6,122 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/pkg/models"
+	"github.com/theonlyjohnny/phoenix/pkg/storage"
+	"github.com/theonlyjohnny/phoenix/pkg/storage/redis"
 	"github.com/theonlyjohnny/phoenix/testsupport"
 )
 
-type storageGenFunc func() (Storage, error)
-
-var storageFuncs = map[string]storageGenFunc{
-	"redis": NewRedisStorage,
-	"local": NewLocalStorage,
+type test struct {
+	name string
+	run  func(*testing.T, storage.Storage)
 }
 
-func TestStore(t *testing.T) {
+type storageGenFunc func(config.ComponentConfig) (storage.Storage, error)
+
+type storageTest struct {
+	name string
+	//storageFunc is called to create a new struct that fulfills the Storage interface
+	storageFunc storageGenFunc
+	//all the functinos in setup are called in each test before calling any methods on the instantiated Storage
+	cfg func() config.ComponentConfig
+}
+
+func noOpCfg() config.ComponentConfig {
+	return config.ComponentConfig{}
+}
+
+var (
+	storages = []storageTest{
+		{
+			"redis",
+			redis.NewRedisStorage,
+			redis.CreateTestDB,
+		},
+		{
+			"mock",
+			testsupport.NewMockStorage,
+			noOpCfg,
+		},
+	}
+	cfg = config.ComponentConfig{}
+)
+
+func TestMain(t *testing.T) {
 	t.Helper()
-	//TODO overwrite tests
-	for name, v := range storageFuncs {
-		t.Run(fmt.Sprintf("testStoreInstance/%s", name), func(t *testing.T) { testStoreInstance(t, v) })
-		t.Run(fmt.Sprintf("testStoreCluster/%s", name), func(t *testing.T) { testStoreCluster(t, v) })
+
+	for _, storageSetup := range storages {
+		tests := []test{
+			{
+				"testStoreInstance",
+				testStoreInstance,
+			},
+			{
+				"testStoreCluster",
+				testStoreCluster,
+			},
+			{
+				"testGetInstance",
+				testGetInstance,
+			},
+			{
+				"testGetCluster",
+				testGetCluster,
+			},
+			{
+				"testDeleteInstance",
+				testDeleteInstance,
+			},
+			{
+				"testDeleteCluster",
+				testDeleteCluster,
+			},
+			{
+				"testListInstances",
+				testListInstances,
+			},
+			{
+				"testListClusters",
+				testListClusters,
+			},
+		}
+
+		for _, test := range tests {
+			testName := fmt.Sprintf("%s/%s", storageSetup.name, test.name)
+			t.Run(testName, func(t *testing.T) {
+				storage, err := storageSetup.storageFunc(storageSetup.cfg())
+
+				if err != nil {
+					t.Fatalf("Unable to setup %s storage -- %s", storageSetup.name, err.Error())
+					return
+				}
+				test.run(t, storage)
+			})
+		}
 	}
 }
 
-func testStoreInstance(t *testing.T, storageFunc storageGenFunc) {
-	storage, err := storageFunc()
-	assert.NoError(t, err)
+func testStoreInstance(t *testing.T, storage storage.Storage) {
 
-	instance := models.NewInstance("")
+	instance := testsupport.NewUniqueInstance()
 
-	err = storage.StoreInstance(instance.PhoenixID, instance)
+	err := storage.StoreInstance(instance.PhoenixID, instance)
 	assert.NoError(t, err)
 }
 
-func testStoreCluster(t *testing.T, storageFunc storageGenFunc) {
-	storage, err := storageFunc()
-	assert.NoError(t, err)
+func testStoreCluster(t *testing.T, storage storage.Storage) {
 
 	cluster := &models.Cluster{}
 
-	err = storage.StoreCluster(cluster.Name, cluster)
+	err := storage.StoreCluster(cluster.Name, cluster)
 	assert.NoError(t, err)
 }
 
-func TestGet(t *testing.T) {
-	t.Helper()
-	for name, v := range storageFuncs {
-		t.Run(fmt.Sprintf("testGetInstance/%s", name), func(t *testing.T) { testGetInstance(t, v) })
-		t.Run(fmt.Sprintf("testGetCluster/%s", name), func(t *testing.T) { testGetCluster(t, v) })
-
-		storage, _ := v()
-		storage.Flush()
-	}
-}
-
-func testGetInstance(t *testing.T, storageFunc storageGenFunc) {
-	storage, err := storageFunc()
-	assert.NoError(t, err)
-
+func testGetInstance(t *testing.T, storage storage.Storage) {
 	instance := models.NewInstance("")
 
-	err = storage.StoreInstance(instance.PhoenixID, instance)
+	err := storage.StoreInstance(instance.PhoenixID, instance)
 	assert.NoError(t, err)
 
 	returnedInstance, err := storage.GetInstance(instance.PhoenixID)
@@ -72,13 +130,11 @@ func testGetInstance(t *testing.T, storageFunc storageGenFunc) {
 	assert.Equal(t, instance, returnedInstance)
 }
 
-func testGetCluster(t *testing.T, storageFunc storageGenFunc) {
-	storage, err := storageFunc()
-	assert.NoError(t, err)
+func testGetCluster(t *testing.T, storage storage.Storage) {
 
 	cluster := &models.Cluster{}
 
-	err = storage.StoreCluster(cluster.Name, cluster)
+	err := storage.StoreCluster(cluster.Name, cluster)
 	assert.NoError(t, err)
 
 	returnedCluster, err := storage.GetCluster(cluster.Name)
@@ -87,24 +143,11 @@ func testGetCluster(t *testing.T, storageFunc storageGenFunc) {
 	assert.Equal(t, cluster, returnedCluster)
 }
 
-func TestDelete(t *testing.T) {
-	t.Helper()
-	for name, v := range storageFuncs {
-		t.Run(fmt.Sprintf("testDeleteCluster/%s", name), func(t *testing.T) { testDeleteCluster(t, v) })
-		t.Run(fmt.Sprintf("testDeleteInstance/%s", name), func(t *testing.T) { testDeleteInstance(t, v) })
-
-		storage, _ := v()
-		storage.Flush()
-	}
-}
-
-func testDeleteCluster(t *testing.T, storageFunc storageGenFunc) {
-	storage, err := storageFunc()
-	assert.NoError(t, err)
+func testDeleteCluster(t *testing.T, storage storage.Storage) {
 
 	cluster := &models.Cluster{}
 
-	err = storage.StoreCluster(cluster.Name, cluster)
+	err := storage.StoreCluster(cluster.Name, cluster)
 	assert.NoError(t, err)
 
 	returnedCluster, err := storage.GetCluster(cluster.Name)
@@ -123,13 +166,10 @@ func testDeleteCluster(t *testing.T, storageFunc storageGenFunc) {
 
 }
 
-func testDeleteInstance(t *testing.T, storageFunc storageGenFunc) {
-	storage, err := storageFunc()
-	assert.NoError(t, err)
-
+func testDeleteInstance(t *testing.T, storage storage.Storage) {
 	instance := models.NewInstance("")
 
-	err = storage.StoreInstance(instance.Name, instance)
+	err := storage.StoreInstance(instance.Name, instance)
 	assert.NoError(t, err)
 
 	returnedInstance, err := storage.GetInstance(instance.Name)
@@ -148,29 +188,14 @@ func testDeleteInstance(t *testing.T, storageFunc storageGenFunc) {
 
 }
 
-func TestList(t *testing.T) {
-	t.Helper()
-	for name, v := range storageFuncs {
-		t.Run(fmt.Sprintf("testListInstances/%s", name), func(t *testing.T) { testListInstances(t, v) })
-		t.Run(fmt.Sprintf("testListClusters/%s", name), func(t *testing.T) { testListClusters(t, v) })
-
-		storage, _ := v()
-		storage.Flush()
-	}
-}
-
-func testListInstances(t *testing.T, storageFunc storageGenFunc) {
-
-	storage, err := storageFunc()
-	assert.NoError(t, err)
-
+func testListInstances(t *testing.T, storage storage.Storage) {
 	cnt := 5
 	tests := make([]*models.Instance, cnt, cnt)
 
 	for i := 0; i < cnt; i++ {
 		tests[i] = models.NewInstance(strconv.FormatInt(int64(i), 10))
 
-		err = storage.StoreInstance(tests[i].PhoenixID, tests[i])
+		err := storage.StoreInstance(tests[i].PhoenixID, tests[i])
 		assert.NoError(t, err)
 	}
 
@@ -181,18 +206,14 @@ func testListInstances(t *testing.T, storageFunc storageGenFunc) {
 
 }
 
-func testListClusters(t *testing.T, storageFunc storageGenFunc) {
-
-	storage, err := storageFunc()
-	assert.NoError(t, err)
-
+func testListClusters(t *testing.T, storage storage.Storage) {
 	cnt := 5
 	tests := make([]*models.Cluster, cnt, cnt)
 
 	for i := 0; i < cnt; i++ {
 		tests[i] = &models.Cluster{Name: strconv.FormatInt(int64(i), 10)}
 
-		err = storage.StoreCluster(tests[i].Name, tests[i])
+		err := storage.StoreCluster(tests[i].Name, tests[i])
 		assert.NoError(t, err)
 	}
 
@@ -201,33 +222,4 @@ func testListClusters(t *testing.T, storageFunc storageGenFunc) {
 
 	assert.ElementsMatch(t, tests, clusters)
 
-}
-
-func TestFlush(t *testing.T) {
-	t.Helper()
-	for name, storageFunc := range storageFuncs {
-		t.Run(fmt.Sprintf("TestFlush/%s", name), func(t *testing.T) {
-			storage, err := storageFunc()
-
-			assert.NoError(t, err)
-
-			cluster := testsupport.NewUniqueCluster()
-			instance := testsupport.NewUniqueInstance()
-
-			storage.StoreCluster(cluster.Name, cluster)
-			storage.StoreInstance(instance.PhoenixID, instance)
-
-			err = storage.Flush()
-			assert.NoError(t, err)
-
-			resCluster, err := storage.GetCluster(cluster.Name)
-			assert.Error(t, err)
-			assert.Nil(t, resCluster)
-
-			resInstance, err := storage.GetInstance(instance.PhoenixID)
-			assert.Error(t, err)
-			assert.Nil(t, resInstance)
-
-		})
-	}
 }

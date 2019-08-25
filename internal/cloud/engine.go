@@ -17,7 +17,7 @@ func init() {
 }
 
 type Engine struct {
-	baseCfgs      map[string]config.CloudProviderConfig
+	baseCfgs      map[string]config.ComponentConfig
 	providerCache map[string]cloud.Provider
 
 	storage *storage.Engine
@@ -31,13 +31,13 @@ func NewCloudEngine(cfg *config.Config, s *storage.Engine) *Engine {
 	}
 }
 
-func (e *Engine) GetCloudProvider(clusterName string, cfg *config.CloudProviderConfig) (cloud.Provider, error) {
+func (e *Engine) GetCloudProvider(clusterName string, cfg *config.ComponentConfig) (cloud.Provider, error) {
 	// log.Debugf("getCloudProvider cache: %#v name: %s base: %s", e.providerCache, clusterName, e.baseCfgs)
 	if provider, ok := e.providerCache[clusterName]; ok {
 		return provider, nil
 	}
 
-	var finalCfg config.CloudProviderConfig
+	var finalCfg config.ComponentConfig
 
 	var provider cloud.Provider
 	var providerType string

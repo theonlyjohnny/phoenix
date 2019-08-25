@@ -1,11 +1,13 @@
-package storage
+package redis
 
 import (
 	"encoding/json"
 	"fmt"
 
 	"github.com/go-redis/redis"
+	"github.com/theonlyjohnny/phoenix/internal/config"
 	"github.com/theonlyjohnny/phoenix/pkg/models"
+	"github.com/theonlyjohnny/phoenix/pkg/storage"
 )
 
 type RedisStorage struct {
@@ -13,28 +15,25 @@ type RedisStorage struct {
 	instanceClient *redis.Client
 }
 
-func newClient(db int) (*redis.Client, error) {
+func NewRedisStorage(cfg config.ComponentConfig) (storage.Storage, error) {
 
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       db,
-	})
+	clusterDBConfig := defaultConfig(0)
+	instanceDBConfig := defaultConfig(1)
 
-	_, err := client.Ping().Result()
+	if passedClusterCfg, err := cfg.GetNestedConfigComponent("cluster"); err != nil {
+		clusterDBConfig = clusterDBConfig.Extend(passedClusterCfg)
+	}
+
+	if passedInstanceCfg, err := cfg.GetNestedConfigComponent("instance"); err != nil {
+		instanceDBConfig = instanceDBConfig.Extend(passedInstanceCfg)
+	}
+
+	clusterClient, err := newClient(clusterDBConfig)
 	if err != nil {
 		return nil, err
 	}
-	return client, nil
-}
 
-func NewRedisStorage() (Storage, error) {
-	clusterClient, err := newClient(0)
-	if err != nil {
-		return nil, err
-	}
-
-	instanceClient, err := newClient(1)
+	instanceClient, err := newClient(instanceDBConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -44,6 +43,45 @@ func NewRedisStorage() (Storage, error) {
 		instanceClient: instanceClient,
 	}, nil
 
+}
+
+func defaultConfig(db int) config.ComponentConfig {
+	return config.ComponentConfig{
+		"db":       db,
+		"address":  "localhost:6379",
+		"password": "",
+	}
+}
+
+func newClient(cfg config.ComponentConfig) (*redis.Client, error) {
+
+	address, err := cfg.GetStr("address")
+	if err != nil {
+		return nil, err
+	}
+
+	password, err := cfg.GetStr("password")
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := cfg.GetInt("db")
+	if err != nil {
+		return nil, err
+	}
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     address,
+		Password: password,
+		DB:       db,
+	})
+
+	_, err = client.Ping().Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
 
 func (r *RedisStorage) parseCluster(input interface{}) (*models.Cluster, error) {
@@ -214,12 +252,17 @@ func (r *RedisStorage) DeleteCluster(key string) error {
 	return client.Del(key).Err()
 }
 
-func (r *RedisStorage) Flush() error {
-	err := r.instanceClient.FlushDB().Err()
-	errTwo := r.clusterClient.FlushDB().Err()
-
-	if err != nil {
-		return err
+func CreateTestDB() config.ComponentConfig {
+	return config.ComponentConfig{
+		"instance": config.ComponentConfig{
+			"db":       0,
+			"address":  "",
+			"password": "",
+		},
+		"cluster": config.ComponentConfig{
+			"db":       0,
+			"address":  "",
+			"password": "",
+		},
 	}
-	return errTwo
 }

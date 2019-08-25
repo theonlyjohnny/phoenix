@@ -3,6 +3,7 @@ package ec2
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -30,15 +31,30 @@ type EC2 struct {
 	ctx    context.Context
 }
 
-func NewEC2CloudProvider(cfg config.CloudProviderConfig) (EC2, error) {
+func NewEC2CloudProvider(cfg config.ComponentConfig) (EC2, error) {
 	var e EC2
 	errs := make([]error, 3)
+
 	awsID, err := cfg.GetStr("AWS_ACCESS_KEY_ID")
-	errs = append(errs, err)
+	if err != nil {
+		errs = append(errs, err)
+	} else if awsID == "" {
+		errs = append(errs, fmt.Errorf("AWS_ACCESS_KEY_ID is a required parameter"))
+	}
+
 	awsSecret, err := cfg.GetStr("AWS_SECRET_ACCESS_KEY")
-	errs = append(errs, err)
+	if err != nil {
+		errs = append(errs, err)
+	} else if awsID == "" {
+		errs = append(errs, fmt.Errorf("AWS_SECRET_ACCESS_KEY is a required parameter"))
+	}
+
 	awsRegion, err := cfg.GetStr("AWS_REGION")
-	errs = append(errs, err)
+	if err != nil {
+		errs = append(errs, err)
+	} else if awsID == "" {
+		errs = append(errs, fmt.Errorf("AWS_REGION is a required parameter"))
+	}
 
 	for _, er := range errs {
 		if er != nil {

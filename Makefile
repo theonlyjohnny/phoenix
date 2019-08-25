@@ -8,11 +8,17 @@ DIST=./dist
 
 TEST_OUTPUT=/tmp/phoenix/test_output
 
-test:
+test-setup:
 	mkdir -p $(TEST_OUTPUT)
+
+test: test-setup
 	TEST_OUTPUT=$(TEST_OUTPUT) go test -race ./... -coverprofile=$(TEST_OUTPUT)/phoenix_coverage.out -covermode=atomic
 
-coverage: test
+test-v: test-setup
+	export TEST_OUTPUT=$(TEST_OUTPUT)
+	TEST_OUTPUT=$(TEST_OUTPUT) go test -race ./... -coverprofile=$(TEST_OUTPUT)/phoenix_coverage.out -covermode=atomic -v=1
+
+coverage: test-v
 	go tool cover -html=$(TEST_OUTPUT)/phoenix_coverage.out
 
 clean:

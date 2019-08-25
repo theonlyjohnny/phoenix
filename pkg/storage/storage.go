@@ -15,6 +15,4 @@ type Storage interface {
 
 	DeleteCluster(string) error
 	DeleteInstance(string) error
-
-	Flush() error
 }
