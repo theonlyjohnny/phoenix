@@ -1,9 +1,10 @@
-package models
+package models_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
 
 const (
@@ -11,11 +12,11 @@ const (
 )
 
 func TestLocationString(t *testing.T) {
-	assert.NotEmpty(t, Location{}.String())
+	assert.NotEmpty(t, models.Location{}.String())
 }
 
 func TestInstanceString(t *testing.T) {
-	assert.NotEmpty(t, Instance{}.String())
+	assert.NotEmpty(t, models.Instance{}.String())
 }
 
 func TestNewInstance(t *testing.T) {
@@ -24,17 +25,17 @@ func TestNewInstance(t *testing.T) {
 }
 
 func testNewInstance(t *testing.T) {
-	instance := NewInstance(testInstanceName)
+	instance := models.NewInstance(testInstanceName)
 	assert.Equal(t, testInstanceName, instance.Name)
 	assert.NotEmpty(t, instance.PhoenixID)
 }
 
 func testNewInstanceIDUnique(t *testing.T) {
-	first := NewInstance(testInstanceName)
+	first := models.NewInstance(testInstanceName)
 	assert.Equal(t, testInstanceName, first.Name)
 	assert.NotEmpty(t, first.PhoenixID)
 
-	second := NewInstance(testInstanceName)
+	second := models.NewInstance(testInstanceName)
 	assert.Equal(t, testInstanceName, first.Name)
 	assert.NotEmpty(t, second.PhoenixID)
 

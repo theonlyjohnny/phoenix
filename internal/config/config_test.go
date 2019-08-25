@@ -1,4 +1,4 @@
-package config
+package config_test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/theonlyjohnny/phoenix/internal/config"
 )
 
 var (
@@ -14,20 +15,7 @@ var (
 )
 
 func TestConsistentDefault(t *testing.T) {
-	assert.Equal(t, defaultConfig(), defaultConfig())
-}
-
-func TestStrContains(t *testing.T) {
-	t.Run("testStrContainsTrue", testStrContainsTrue)
-	t.Run("testStrContainsFalse", testStrContainsFalse)
-}
-
-func testStrContainsTrue(t *testing.T) {
-	assert.True(t, strContains("foo", []string{"foo", "bar"}))
-}
-
-func testStrContainsFalse(t *testing.T) {
-	assert.False(t, strContains("foo", []string{"fooo", "bar"}))
+	assert.Equal(t, config.DefaultConfig(), config.DefaultConfig())
 }
 
 func TestReadConfigFromFs(t *testing.T) {
@@ -43,7 +31,7 @@ func TestReadConfigFromFs(t *testing.T) {
 }
 
 func testReadInvalidFile(t *testing.T) {
-	assert.Equal(t, defaultConfig(), ReadConfigFromFs("/"))
+	assert.Equal(t, config.DefaultConfig(), config.ReadConfigFromFs("/"))
 }
 
 func testReadInvalidJSON(t *testing.T) {
@@ -52,7 +40,7 @@ func testReadInvalidJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, defaultConfig(), ReadConfigFromFs(path))
+	assert.Equal(t, config.DefaultConfig(), config.ReadConfigFromFs(path))
 
 }
 
@@ -63,23 +51,23 @@ func testReadInvalidCloud(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, defaultConfig(), ReadConfigFromFs(path))
+	assert.Equal(t, config.DefaultConfig(), config.ReadConfigFromFs(path))
 
 }
 
 func testReadValidCloud(t *testing.T) {
-	expectedCloudType := "valid"
-	validClouds = append(validClouds, expectedCloudType)
+	expectedCloudType := "ec2"
+
 	path := fmt.Sprintf("%s/validcloud.json", fileBase)
 	contents := fmt.Sprintf("{\"cloud_type\": \"%s\"}", expectedCloudType)
 	if err := ioutil.WriteFile(path, []byte(contents), 0755); err != nil {
 		t.Fatal(err)
 	}
 
-	expected := defaultConfig()
+	expected := config.DefaultConfig()
 	expected.CloudType = expectedCloudType
 
-	assert.Equal(t, expected, ReadConfigFromFs(path))
+	assert.Equal(t, expected, config.ReadConfigFromFs(path))
 
 }
 
@@ -90,21 +78,21 @@ func testReadInvalidStorage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, defaultConfig(), ReadConfigFromFs(path))
+	assert.Equal(t, config.DefaultConfig(), config.ReadConfigFromFs(path))
 }
 
 func testReadValidStorage(t *testing.T) {
-	expectedStorageType := "valid"
-	validStorages = append(validStorages, expectedStorageType)
+	expectedStorageType := "redis"
+
 	path := fmt.Sprintf("%s/validstorage.json", fileBase)
 	contents := fmt.Sprintf("{\"storage_type\": \"%s\"}", expectedStorageType)
 	if err := ioutil.WriteFile(path, []byte(contents), 0755); err != nil {
 		t.Fatal(err)
 	}
 
-	expected := defaultConfig()
+	expected := config.DefaultConfig()
 	expected.StorageType = expectedStorageType
 
-	assert.Equal(t, expected, ReadConfigFromFs(path))
+	assert.Equal(t, expected, config.ReadConfigFromFs(path))
 
 }

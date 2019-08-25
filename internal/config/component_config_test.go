@@ -1,9 +1,10 @@
-package config
+package config_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/theonlyjohnny/phoenix/internal/config"
 )
 
 func TestGetStrFromCfg(t *testing.T) {
@@ -14,7 +15,7 @@ func TestGetStrFromCfg(t *testing.T) {
 }
 
 func testGetStrFromCfgValid(t *testing.T) {
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"foo": "bar",
 	}
 
@@ -25,7 +26,7 @@ func testGetStrFromCfgValid(t *testing.T) {
 }
 
 func testGetStrFromCfgNotFound(t *testing.T) {
-	cfg := ComponentConfig{}
+	cfg := config.ComponentConfig{}
 
 	res, err := cfg.GetStr("foo")
 
@@ -34,7 +35,7 @@ func testGetStrFromCfgNotFound(t *testing.T) {
 }
 
 func testGetStrFromCfgNotStr(t *testing.T) {
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"foo": map[string]string{"bar": "bar"},
 	}
 
@@ -45,7 +46,7 @@ func testGetStrFromCfgNotStr(t *testing.T) {
 }
 
 func testGetStrFromCfgEmptyStr(t *testing.T) {
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"foo": "",
 	}
 
@@ -63,19 +64,19 @@ func TestExtend(t *testing.T) {
 }
 
 func testExtendWithEmpty(t *testing.T) {
-	base := ComponentConfig{
+	base := config.ComponentConfig{
 		"foo": "bar",
 	}
 
-	extension := ComponentConfig{}
+	extension := config.ComponentConfig{}
 
 	assert.Equal(t, base, base.Extend(extension))
 }
 
 func testExtendOnEmpty(t *testing.T) {
-	base := ComponentConfig{}
+	base := config.ComponentConfig{}
 
-	extension := ComponentConfig{
+	extension := config.ComponentConfig{
 		"foo": "bar",
 	}
 
@@ -83,11 +84,11 @@ func testExtendOnEmpty(t *testing.T) {
 }
 
 func testExtendOverwrite(t *testing.T) {
-	base := ComponentConfig{
+	base := config.ComponentConfig{
 		"foo": "bar1",
 	}
 
-	extension := ComponentConfig{
+	extension := config.ComponentConfig{
 		"foo": "bar",
 	}
 
@@ -95,13 +96,13 @@ func testExtendOverwrite(t *testing.T) {
 }
 
 func testExtendOverwriteComplex(t *testing.T) {
-	base := ComponentConfig{
+	base := config.ComponentConfig{
 		"foo": map[string]string{
 			"foo1": "bar1",
 		},
 	}
 
-	extension := ComponentConfig{
+	extension := config.ComponentConfig{
 		"foo": "bar",
 	}
 
@@ -116,7 +117,7 @@ func TestGetIntFromCfg(t *testing.T) {
 }
 
 func testGetIntFromCfgValid(t *testing.T) {
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"foo": 12,
 	}
 
@@ -127,7 +128,7 @@ func testGetIntFromCfgValid(t *testing.T) {
 }
 
 func testGetIntFromCfgNotFound(t *testing.T) {
-	cfg := ComponentConfig{}
+	cfg := config.ComponentConfig{}
 
 	res, err := cfg.GetInt("foo")
 
@@ -136,7 +137,7 @@ func testGetIntFromCfgNotFound(t *testing.T) {
 }
 
 func testGetIntFromCfgNotInt(t *testing.T) {
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"foo": map[string]string{"bar": "bar"},
 	}
 
@@ -147,7 +148,7 @@ func testGetIntFromCfgNotInt(t *testing.T) {
 }
 
 func testGetIntFromCfgEmptyInt(t *testing.T) {
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"foo": 0,
 	}
 
@@ -165,11 +166,11 @@ func TestGetConfigComponentFromCfg(t *testing.T) {
 }
 
 func testGetConfigComponentFromCfgValid(t *testing.T) {
-	nested := ComponentConfig{
+	nested := config.ComponentConfig{
 		"foo":  "bar",
 		"foo2": 12,
 	}
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"nested": nested,
 	}
 
@@ -180,7 +181,7 @@ func testGetConfigComponentFromCfgValid(t *testing.T) {
 }
 
 func testGetConfigComponentFromCfgNotFound(t *testing.T) {
-	cfg := ComponentConfig{}
+	cfg := config.ComponentConfig{}
 
 	res, err := cfg.GetNestedConfigComponent("foo")
 
@@ -189,7 +190,7 @@ func testGetConfigComponentFromCfgNotFound(t *testing.T) {
 }
 
 func testGetConfigComponentFromCfgNotConfigComponent(t *testing.T) {
-	cfg := ComponentConfig{
+	cfg := config.ComponentConfig{
 		"foo": []string{"bar", "bar"},
 	}
 
@@ -200,8 +201,8 @@ func testGetConfigComponentFromCfgNotConfigComponent(t *testing.T) {
 }
 
 func testGetConfigComponentFromCfgEmptyConfigComponent(t *testing.T) {
-	cfg := ComponentConfig{
-		"foo": ComponentConfig{},
+	cfg := config.ComponentConfig{
+		"foo": config.ComponentConfig{},
 	}
 
 	res, err := cfg.GetNestedConfigComponent("foo")

@@ -1,9 +1,10 @@
-package models
+package models_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/theonlyjohnny/phoenix/pkg/models"
 )
 
 const (
@@ -18,11 +19,11 @@ func TestHasInstance(t *testing.T) {
 }
 
 func testHasInstanceTrue(t *testing.T) {
-	cluster := &Cluster{
+	cluster := &models.Cluster{
 		Name: testClusterName,
 	}
 
-	instance := &Instance{
+	instance := &models.Instance{
 		ClusterName: testClusterName,
 	}
 
@@ -30,11 +31,11 @@ func testHasInstanceTrue(t *testing.T) {
 }
 
 func testHasInstanceFalse(t *testing.T) {
-	cluster := &Cluster{
+	cluster := &models.Cluster{
 		Name: testClusterName,
 	}
 
-	instance := &Instance{
+	instance := &models.Instance{
 		ClusterName: testClusterName + "_",
 	}
 
@@ -42,7 +43,7 @@ func testHasInstanceFalse(t *testing.T) {
 }
 
 func TestClusterString(t *testing.T) {
-	cluster := Cluster{}
+	cluster := models.Cluster{}
 
 	assert.NotEmpty(t, cluster.String())
 }

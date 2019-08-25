@@ -33,7 +33,7 @@ type Config struct {
 	StorageConfig ComponentConfig `json:"storage_config"`
 }
 
-func defaultConfig() *Config {
+func DefaultConfig() *Config {
 	return &Config{
 		Port:                9000,
 		LoopInterval:        time.Second * 10,
@@ -47,7 +47,7 @@ func defaultConfig() *Config {
 //ReadConfigFromFs reads from the specified path and merges any options onto a default instance of Config
 func ReadConfigFromFs(path string) *Config {
 	log.Debugf("searching for config file @ %s", path)
-	cfg := defaultConfig()
+	cfg := DefaultConfig()
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Warnf("Unable to read file, using default config -- %s", err.Error())
@@ -62,13 +62,13 @@ func ReadConfigFromFs(path string) *Config {
 	isValidStorage := strContains(cfg.StorageType, validStorages)
 
 	if !isValidCloud {
-		defaultCloud := defaultConfig().CloudType
+		defaultCloud := DefaultConfig().CloudType
 		log.Warnf("invalid cloud specified %s -- falling back to %s", cfg.CloudType, defaultCloud)
 		cfg.CloudType = defaultCloud
 	}
 
 	if !isValidStorage {
-		defaultStorage := defaultConfig().StorageType
+		defaultStorage := DefaultConfig().StorageType
 		log.Warnf("invalid storage specified %s -- falling back to %s", cfg.StorageType, defaultStorage)
 		cfg.StorageType = defaultStorage
 	}
