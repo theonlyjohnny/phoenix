@@ -14,3 +14,16 @@ This file is really a TODO more than a README. If you can see this repository, y
  - [ ] Implement `loop` logic to check if an instance has updated since its internal state last changed
  - [ ] Add Provisioner interface (salt, puppet, ansible, etc.) to install Phoenix agent and configure instance (instead of user data in EC2 provider)
  - [ ] Implement auth between client <-> server to validate client is who they say they are
+
+
+## Contributing
+### Adding a new storage
+ - [ ] Add pkg/storage/STORAGE_TYPE folder
+ - [ ] Write STORAGE_TYPE implementation in that folder
+   - [ ] `package STORAGE_TYPE`
+   - [ ] Exported constructor of format `New(STORAGE_TYPE)Storage(config.ComponentConfig) (storage.Storage, error)`
+   - [ ] Fulfill the implementation of storage.Storage (`pkg/storage/storage.go`)
+   - [ ] List methods can be unordered
+ - [ ] Add new storage to the `storages` slice in `pkg/storage/storage_test.go`
+   - [ ] If required, create and export a function to generate a fake configuration
+   - [ ] the `noOpCfg` function can be used if no configuration is required
